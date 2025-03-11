@@ -11,17 +11,17 @@ import {
 import Link from "next/link";
 
 const items = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Mobile", url: "/mobile", icon: Smartphone },
+  { title: "Trang chủ", url: "/", icon: Home },
+  { title: "Điện thoại", url: "/mobile", icon: Smartphone },
   { title: "Laptop", url: "#", icon: Laptop },
   { title: "PC", url: "#", icon: LaptopMinimal },
-  { title: "Earphone", url: "#", icon: Headset },
+  { title: "Tai nghe", url: "#", icon: Headset },
 ];
 
 export function AppSidebar() {
   return (
-    <Sidebar>
-      <SidebarContent className="bg-gray-800 text-white pt-18">
+    <Sidebar className="text-white transition-all duration-300 ease-in-out">
+      <SidebarContent className="pt-16 bg-gray-900">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -30,23 +30,24 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
-                      className={`text-white hover:text-gray-300 hover:bg-gray-700 ${
-                        item.title === "Home" ? "text-xl" : "text-base"
+                      className={`flex items-center w-full py-3 px-4 text-white hover:bg-gray-800 hover:text-blue-300 transition-all duration-200 ${
+                        item.title === "Trang chủ"
+                          ? "text-xl font-semibold"
+                          : "text-base"
                       }`}
                     >
                       <Link href={item.url}>
                         <item.icon
-                          className={`text-white ${
-                            item.title === "Home" ? "w-6 h-6" : "w-5 h-5"
+                          className={`mr-3 ${
+                            item.title === "Trang chủ" ? "w-6 h-6" : "w-5 h-5"
                           }`}
                         />
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                  {/* Đường gạch trắng dưới Home */}
-                  {item.title === "Home" && (
-                    <div className="border-b border-white my-2 mx-4" />
+                  {item.title === "Trang chủ" && (
+                    <div className="border-b border-gray-700 my-3 mx-4" />
                   )}
                 </div>
               ))}

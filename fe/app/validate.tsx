@@ -39,9 +39,23 @@ export const Product = z.object({
   price: z.number(),
   description: z.string(),
   image: z.string(),
-  product_type_id: z.object({
+  product_type: z.object({
     _id: z.string(),
     type: z.string(),
   }),
 });
 export type ProductType = z.infer<typeof Product>;
+
+export const ProductT = z.object({
+  _id: z.string(),
+  type: z.string(),
+});
+export type ProductTType = z.infer<typeof ProductT>;
+
+export const account = z.object({
+  userId: z.string(),
+  email: z.string(),
+  name: z.string(),
+  type: z.string(),
+});
+export type AccountType = z.infer<typeof account>;

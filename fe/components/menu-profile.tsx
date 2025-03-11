@@ -36,9 +36,9 @@ const MenuProfile = () => {
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link href={"/profile"}>Profile</Link>
-        </DropdownMenuItem>
+        <Link href={"/profile"}>
+          <DropdownMenuItem>Profile</DropdownMenuItem>
+        </Link>
         <DropdownMenuItem>Billing</DropdownMenuItem>
         <DropdownMenuItem>Team</DropdownMenuItem>
         <DropdownMenuItem onClick={handeleLogout}>Logout</DropdownMenuItem>

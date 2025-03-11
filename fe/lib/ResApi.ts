@@ -1,6 +1,8 @@
 import {
+  AccountType,
   LoginResType,
   LoginType,
+  ProductTType,
   ProductType,
   RegisterResType,
   RegisterType,
@@ -69,6 +71,25 @@ const ReqApi = {
         "Content-Type": "application/json",
       },
     }),
+  getAllMobileType: async () =>
+    https.get<ProductTType[]>(`/product-types`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }),
+  getMe: async (accessToken: string) => {
+    return https.post<AccountType>(
+      `/auth/me`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `accessToken=${accessToken}`,
+        },
+        credentials: "include",
+      },
+      {}
+    );
+  },
 };
 
 export default ReqApi;

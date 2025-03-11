@@ -2,6 +2,7 @@ type Option = {
   url?: string;
   headers: HeadersInit;
   credentials?: RequestCredentials;
+  withCredentials?: boolean;
 };
 
 const res = async <Request>({

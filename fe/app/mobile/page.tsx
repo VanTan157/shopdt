@@ -13,7 +13,12 @@ const MobilePage = async () => {
       console.log("Lỗi không xác định");
     }
   }
-  return <ProductList products={products || []} />;
+
+  return (
+    <div>
+      <ProductList products={products || []} />
+    </div>
+  );
 };
 
 export default MobilePage;

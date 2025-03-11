@@ -2,6 +2,8 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "../users/users.service";
 import { LoginUserDto } from "./dto/login-user.dto";
+import { ChangePasswordDto, UpdateProfileDto } from "./dto/update-profile.dto";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
@@ -70,4 +72,49 @@ export class AuthService {
       throw new UnauthorizedException("Invalid refresh token");
     }
   }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const updatedUser = await this.usersService.update(userId, {
+      name: updateProfileDto.name,
+    });
+    return {
+      success: true,
+      message: "Cập nhật tên thành công",
+      user: updatedUser,
+    };
+  }
+
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    const user = await this.usersService.findOne(userId);
+    const isMatch = await bcrypt.compare(
+      changePasswordDto.oldPassword,
+      user.password
+    );
+
+    if (!isMatch) {
+      throw new UnauthorizedException("Mật khẩu cũ không đúng");
+    }
+
+    const saltRounds = 10;
+    const newHashedPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      saltRounds
+    );
+
+    const updatedUser = await this.usersService.update(userId, {
+      password: newHashedPassword,
+    });
+    return {
+      success: true,
+      user: updatedUser,
+      message: "Đổi mật khẩu thành công",
+    };
+  }
+
+  // async getUser(userId: string) {
+  //   const user = await this.usersService.findOne(userId);
+  //   return {
+  //     user,
+  //   };
+  // }
 }

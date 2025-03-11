@@ -34,4 +34,30 @@ export class ProductTypesService {
     }
     return ProductType;
   }
+
+  async update(id: string, type: string): Promise<ProductType> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error("ID không hợp lệ");
+    }
+    const ProductType = await this.productTypeModel
+      .findByIdAndUpdate({ _id: id }, { type }, { new: true })
+      .exec();
+    if (!ProductType) {
+      throw new Error("Không tìm thấy ProductType");
+    }
+    return ProductType;
+  }
+
+  async remove(id: string): Promise<ProductType> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error("ID không hợp lệ");
+    }
+    const ProductType = await this.productTypeModel
+      .findByIdAndDelete({ _id: id })
+      .exec();
+    if (!ProductType) {
+      throw new Error("Không tìm thấy Product");
+    }
+    return ProductType;
+  }
 }
