@@ -26,10 +26,10 @@ const res = async <Request>({
       body: body ? JSON.stringify(body) : undefined, // Avoid stringifying undefined
       ...option,
     });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Lỗi server"); // Throw the specific message
-    }
+    // if (!response.ok) {
+    //   const error = await response.json();
+    //   throw new Error(error.message || "Lỗi server"); // Throw the specific message
+    // }
     const payload: Request = await response.json();
     return payload;
   } catch (error) {

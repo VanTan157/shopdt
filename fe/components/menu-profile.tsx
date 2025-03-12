@@ -19,6 +19,7 @@ const MenuProfile = () => {
     try {
       const res = await ReqApi.logout();
       console.log(res);
+      router.push("/login");
       router.refresh();
     } catch (error) {
       if (error instanceof Error) {

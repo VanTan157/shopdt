@@ -1,3 +1,8 @@
+"use client";
+import { useUser } from "./UserContext";
+
 export default function Home() {
-  return <h1>Hello</h1>;
+  const { user } = useUser();
+  console.log(user);
+  return;
 }

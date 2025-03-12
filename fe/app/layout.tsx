@@ -5,6 +5,10 @@ import Header from "@/components/header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ClientWrapper } from "@/components/ClientWrapper";
 import { AppSidebar } from "@/components/app-sidebar";
+import { Toaster } from "@/components/ui/sonner";
+import { cookies } from "next/headers";
+import ReqApi from "@/lib/ResApi";
+import { UserProvider } from "@/app/UserContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,11 +25,22 @@ export const metadata: Metadata = {
   description: "A web built with Next.js",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+  let user = null;
+  try {
+    const res = await ReqApi.getMe(accessToken as string);
+    user = res;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    } else console.log("Lỗi không xác định");
+  }
   return (
     <html lang="en">
       <body
@@ -37,7 +52,10 @@ export default function RootLayout({
               <AppSidebar />
               <div className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
                 <Header />
-                <main className="flex-1">{children}</main>
+                <main className="flex-1">
+                  <UserProvider initialUser={user}>{children}</UserProvider>
+                </main>
+                <Toaster />
               </div>
             </div>
           </SidebarProvider>

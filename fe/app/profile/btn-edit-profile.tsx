@@ -20,17 +20,92 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { AccountType } from "../validate";
+import https from "@/lib/http";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-const BtnEditProfile = () => {
-  const [open, setOpen] = useState(false); // Quản lý trạng thái dialog
+const BtnEditProfile = (user: { user: AccountType }) => {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [currentP, setCurrentP] = useState("");
+  const [newP, setNewP] = useState("");
+  const router = useRouter();
 
-  const handleSave = () => {
-    // Xử lý logic lưu dữ liệu (nếu có)
-    console.log("Saved!");
-    setOpen(false); // Đóng dialog
+  // Hàm xử lý khi đóng Dialog
+  interface HandleDialogChangeProps {
+    isOpen: boolean;
+  }
+
+  const handleDialogChange = (isOpen: HandleDialogChangeProps["isOpen"]) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      // Reset các field khi đóng dialog
+      setName("");
+      setCurrentP("");
+      setNewP("");
+    }
   };
+
+  // Hàm save cho Account tab
+  const saveChange = async () => {
+    try {
+      const res = await https.put(
+        `auth/update-profile`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        },
+        { name }
+      );
+      console.log(res);
+      router.refresh();
+      setName("");
+      setCurrentP("");
+      setNewP("");
+      setOpen(false);
+      toast.success((res as { message: string }).message);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else toast.error("Lỗi không xác định");
+    }
+  };
+
+  // Hàm save cho Password tab
+  const savePassword = async () => {
+    try {
+      const res = await https.put(
+        `auth/change-password`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        },
+        {
+          oldPassword: currentP,
+          newPassword: newP,
+        }
+      );
+      console.log(res);
+      router.refresh();
+      setName("");
+      setCurrentP("");
+      setNewP("");
+      setOpen(false);
+      toast.success((res as { message: string }).message);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else toast.error("Lỗi không xác định");
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
         <Button className="mt-4 w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">
           Edit Profile
@@ -58,21 +133,25 @@ const BtnEditProfile = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Account</CardTitle>
-                <CardDescription>Chang your name here</CardDescription>
+                <CardDescription>Change your name here</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="space-y-1">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" defaultValue="Pedro Duarte" />
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" defaultValue="@peduarte" />
+                  <Input id="email" defaultValue={user.user.email} readOnly />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button
-                  onClick={handleSave}
+                  onClick={saveChange}
                   className="bg-green-500 hover:bg-green-600 w-full"
                 >
                   Save changes
@@ -89,16 +168,26 @@ const BtnEditProfile = () => {
               <CardContent className="space-y-2">
                 <div className="space-y-1">
                   <Label htmlFor="current">Current password</Label>
-                  <Input id="current" type="password" />
+                  <Input
+                    id="current"
+                    type="password"
+                    value={currentP}
+                    onChange={(e) => setCurrentP(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="new">New password</Label>
-                  <Input id="new" type="password" />
+                  <Input
+                    id="new"
+                    type="password"
+                    value={newP}
+                    onChange={(e) => setNewP(e.target.value)}
+                  />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button
-                  onClick={handleSave}
+                  onClick={savePassword}
                   className="bg-green-500 hover:bg-green-600 w-full"
                 >
                   Save password

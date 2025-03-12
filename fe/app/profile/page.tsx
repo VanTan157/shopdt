@@ -30,7 +30,7 @@ const Profile = async () => {
               <span className="font-semibold">Type:</span> {user.type}
             </p>
             <div>
-              <BtnEditProfile />
+              <BtnEditProfile user={user} />
             </div>
           </div>
         ) : (
