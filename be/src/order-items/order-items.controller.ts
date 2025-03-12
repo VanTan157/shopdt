@@ -30,8 +30,9 @@ export class OrderItemsController {
   constructor(private readonly orderItemsService: OrderItemsService) {}
 
   @Post()
-  create(@Body() createOrderItemDto: CreateOrderItemDto) {
-    return this.orderItemsService.create(createOrderItemDto);
+  create(@Body() createOrderItemDto: CreateOrderItemDto, @Req() req: Request) {
+    const userId = (req.user as User).userId;
+    return this.orderItemsService.create(createOrderItemDto, userId);
   }
 
   @UseGuards(RolesGuard)
@@ -44,6 +45,7 @@ export class OrderItemsController {
   @Get("find-by-user")
   findByUserId(@Req() req: Request) {
     const userId = (req.user as User).userId;
+    console.log(userId);
     return this.orderItemsService.findByUserId(userId);
   }
 

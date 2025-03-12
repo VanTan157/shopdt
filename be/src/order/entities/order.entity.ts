@@ -4,7 +4,7 @@ import { Document, Types } from "mongoose";
 @Schema({ timestamps: true })
 export class Order extends Document {
   @Prop({ type: Types.ObjectId, ref: "User", required: true })
-  user_id: Types.ObjectId; // Liên kết với User
+  user_id: Types.ObjectId;
 
   @Prop([{ type: Types.ObjectId, ref: "OrderItem", required: true }])
   orderitem_ids: Types.ObjectId[];
@@ -26,7 +26,7 @@ export class Order extends Document {
       "Đang vận chuyển",
       "Hoàn thành",
       "Đã hủy",
-    ], // Các trạng thái đơn hàng
+    ],
     default: "Đang chờ xác nhận",
   })
   status: string; // Trạng thái đơn hàng

@@ -3,6 +3,9 @@ import { Document, Types } from "mongoose";
 
 @Schema({ timestamps: true })
 export class OrderItem extends Document {
+  @Prop({ type: Types.ObjectId, ref: "User", required: true })
+  user_id: Types.ObjectId;
+
   @Prop({ type: Types.ObjectId, ref: "Product", required: true })
   product_id: Types.ObjectId;
 

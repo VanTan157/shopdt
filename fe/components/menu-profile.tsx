@@ -40,7 +40,9 @@ const MenuProfile = () => {
         <Link href={"/profile"}>
           <DropdownMenuItem>Profile</DropdownMenuItem>
         </Link>
-        <DropdownMenuItem>Billing</DropdownMenuItem>
+        <Link href={"/cart"}>
+          <DropdownMenuItem>Cart</DropdownMenuItem>
+        </Link>
         <DropdownMenuItem>Team</DropdownMenuItem>
         <DropdownMenuItem onClick={handeleLogout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>

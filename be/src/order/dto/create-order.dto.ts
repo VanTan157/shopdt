@@ -1,11 +1,11 @@
 // order/dto/create-order.dto.ts
-import { IsNotEmpty, IsString, IsArray, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsArray, IsOptional } from "class-validator";
 
 export class CreateOrderDto {
   @IsNotEmpty()
   @IsArray()
-  @IsString({ each: true }) // Mỗi phần tử trong mảng là string
-  orderitem_ids: string[]; // Mảng ID của OrderItem
+  @IsString({ each: true })
+  orderitem_ids: string[];
 
   @IsNotEmpty()
   @IsString()
@@ -15,7 +15,7 @@ export class CreateOrderDto {
   @IsString()
   address: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   status?: string; // Tùy chọn, sẽ dùng default nếu không cung cấp
 }
