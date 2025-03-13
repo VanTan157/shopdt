@@ -1,17 +1,39 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateOrderItemDto } from "./dto/create-order-item.dto";
 import { UpdateOrderItemDto } from "./dto/update-order-item.dto";
 import { Model, Types } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { OrderItem } from "./entities/order-item.entity";
 import { ProductsService } from "src/products/products.service";
+import { OrderService } from "src/order/order.service";
 
 @Injectable()
 export class OrderItemsService {
   constructor(
     @InjectModel(OrderItem.name) private orderItemModel: Model<OrderItem>,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    @Inject(forwardRef(() => OrderService))
+    private orderService: OrderService
   ) {}
+
+  async getOrderNotInCart(userId: string) {
+    const order = await this.orderService.getByUser(userId);
+    if (!order) {
+      return [];
+    }
+    const usedOrderItemIds = order.flatMap((order) =>
+      order.orderitem_ids.map((item) => item._id)
+    );
+    return this.orderItemModel
+      .find({ user_id: userId, _id: { $nin: usedOrderItemIds } })
+      .populate("product_id")
+      .exec();
+  }
 
   async create(createOrderItemDto: CreateOrderItemDto, userId) {
     const { product_id, quantity } = createOrderItemDto;

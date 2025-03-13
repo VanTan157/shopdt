@@ -42,6 +42,12 @@ export class OrderItemsController {
     return this.orderItemsService.findAll();
   }
 
+  @Get("get-order-not-in-cart")
+  getOrderNotInCart(@Req() req: Request) {
+    const userId = (req.user as User).userId;
+    return this.orderItemsService.getOrderNotInCart(userId);
+  }
+
   @Get("find-by-user")
   findByUserId(@Req() req: Request) {
     const userId = (req.user as User).userId;

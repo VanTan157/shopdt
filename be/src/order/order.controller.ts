@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from "@nestjs/common";
 import { OrderService } from "./order.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
@@ -41,6 +42,15 @@ export class OrderController {
     return this.orderService.getByUser(userId);
   }
 
+  @Get("find-by-status")
+  findByStatus(
+    @Req() req: Request,
+    @Query("status") status: string // Add query parameter for status
+  ) {
+    const userId = (req.user as User).userId;
+    return this.orderService.getByStatus(userId, status);
+  }
+
   @UseGuards(RolesGuard)
   @Roles("ADMIN")
   @Get()
@@ -62,8 +72,6 @@ export class OrderController {
     return this.orderService.update(id, updateOrderDto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles("ADMIN")
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.orderService.remove(id);

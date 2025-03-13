@@ -6,9 +6,9 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { AuthModule } from "./auth/auth.module";
 import { ConfigModule } from "@nestjs/config";
 import { ProductsModule } from "./products/products.module";
-import { ProductTypesModule } from './product-types/product-types.module';
-import { OrderItemsModule } from './order-items/order-items.module';
-import { OrderModule } from './order/order.module';
+import { ProductTypesModule } from "./product-types/product-types.module";
+import { OrderItemsModule } from "./order-items/order-items.module";
+import { OrderModule } from "./order/order.module";
 
 @Module({
   imports: [

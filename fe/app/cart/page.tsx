@@ -10,13 +10,16 @@ const Page = async () => {
   const accessToken = cookieStore.get("accessToken")?.value;
   let carts: CartType[] = [];
   try {
-    const res = await https.get<CartType[]>(`order-items/find-by-user`, {
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `accessToken=${accessToken}`,
-      },
-      credentials: "include",
-    });
+    const res = await https.get<CartType[]>(
+      `order-items/get-order-not-in-cart`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `accessToken=${accessToken}`,
+        },
+        credentials: "include",
+      }
+    );
     carts = res;
   } catch (error) {
     if (error instanceof Error) {

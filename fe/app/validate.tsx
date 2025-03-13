@@ -77,10 +77,24 @@ export const cart = z.object({
 });
 export type CartType = z.infer<typeof cart>;
 
-//  _id: '67d1e4d391613eb7be50a9fb',
-//     user_id: '67cde7e68ebf870e2d71625a',
-//     orderitem_ids: [ '67d1e479f9d1b06c51ad1b58', '67d1e489f9d1b06c51ad1b5d' ],
-//     total_amount: 740736,
-//     phone_number: '0123456789',
-//     address: '123 Đường ABC, Quận 1, TP.HCM',
-//     status: 'Đang chờ xác nhận',
+export const cartCreate = z.object({
+  _id: z.string(),
+  user_id: z.string(),
+  product_id: z.string(),
+  quantity: z.number(),
+  unit_price: z.number(),
+  total_price: z.number(),
+});
+export type CartCreateType = z.infer<typeof cartCreate>;
+
+export const order = z.object({
+  _id: z.string(),
+  user_id: z.string(),
+  orderitem_ids: z.array(cart),
+  total_amount: z.number(),
+  phone_number: z.number(),
+  address: z.string(),
+  status: z.string(),
+  createdAt: z.string(),
+});
+export type OrderType = z.infer<typeof order>;

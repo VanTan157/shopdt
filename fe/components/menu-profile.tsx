@@ -43,7 +43,9 @@ const MenuProfile = () => {
         <Link href={"/cart"}>
           <DropdownMenuItem>Cart</DropdownMenuItem>
         </Link>
-        <DropdownMenuItem>Team</DropdownMenuItem>
+        <Link href={"/order"}>
+          <DropdownMenuItem>Order</DropdownMenuItem>
+        </Link>
         <DropdownMenuItem onClick={handeleLogout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
