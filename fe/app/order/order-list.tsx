@@ -7,34 +7,34 @@ interface OrderNavProps {
 
 const OrderList = ({ orders }: OrderNavProps) => {
   return (
-    <div className="pt-18 container mx-auto pb-2">
-      <h1 className="text-3xl font-bold mb-4 text-gray-900">
+    <div className="container mx-auto py-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900">
         Đơn hàng của bạn
       </h1>
       {orders.length === 0 ? (
-        <p className="text-gray-500 text-lg text-center">Trống</p>
+        <p className="text-center text-gray-500">Trống</p>
       ) : (
         <div className="space-y-8">
           {orders.map((order) => (
             <div
               key={order._id}
-              className="bg-white shadow-lg rounded-xl p-4 border border-gray-200"
+              className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
             >
-              <div className="flex justify-between items-center border-b pb-2 mb-2">
+              <div className="flex justify-between items-center border-b pb-4 mb-4">
                 <div>
-                  <p className="text-gray-800 font-semibold">
-                    <span className="text-xl text-red-500">Mã đơn hàng</span>:{" "}
+                  <p className="text-gray-800 font-medium">
+                    <span className="text-red-500">Mã đơn hàng:</span>{" "}
                     {order._id}
                   </p>
                   <p className="text-gray-500 text-sm">
                     Ngày đặt: {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <span className="px-4 py-2 text-sm font-medium rounded-full bg-blue-200 text-blue-700">
+                <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-600">
                   {order.status}
                 </span>
               </div>
-              <div className="space-y-2 text-gray-700">
+              <div className="text-gray-700 space-y-2">
                 <p>
                   <span className="font-medium">Địa chỉ:</span> {order.address}
                 </p>
@@ -42,11 +42,11 @@ const OrderList = ({ orders }: OrderNavProps) => {
                   <span className="font-medium">Số điện thoại:</span>{" "}
                   {order.phone_number}
                 </p>
-                <p className="font-semibold text-lg">
+                <p className="font-medium">
                   Tổng tiền: {order.total_amount.toLocaleString()} VND
                 </p>
               </div>
-              <div className="mt-2">
+              <div className="mt-4">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Sản phẩm
                 </h2>
@@ -62,22 +62,22 @@ const OrderList = ({ orders }: OrderNavProps) => {
                           alt={item.product_id.name}
                           width={60}
                           height={60}
-                          className="object-cover rounded-lg border border-gray-300"
+                          className="object-cover rounded"
                           quality={100}
                         />
                         <div>
                           <p className="text-gray-800 font-medium">
                             {item.product_id.name}
                           </p>
-                          <p className="text-gray-500 text-sm">
+                          <p className="text-gray-500 text-xs">
                             Giá: {item.product_id.price.toLocaleString()} VND
                           </p>
-                          <p className="text-gray-500 text-sm">
+                          <p className="text-gray-500 text-xs">
                             Số lượng: {item.quantity}
                           </p>
                         </div>
                       </div>
-                      <p className="text-gray-900 font-semibold text-lg">
+                      <p className="text-gray-900 font-medium text-sm">
                         {item.total_price.toLocaleString()} VND
                       </p>
                     </li>

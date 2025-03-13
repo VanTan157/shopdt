@@ -19,7 +19,7 @@ const Header = async () => {
           />
         </div>
         {access_token ? (
-          <div className="pr-4">
+          <div className="pr-4" id="avatar-icon">
             <MenuProfile />
           </div>
         ) : (

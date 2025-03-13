@@ -30,19 +30,14 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         >
           <Link href={`/mobile/mobile-item/${product._id}`}>
             {/* Enhanced Image Container */}
-            <div className="relative w-full h-40 mb-4 overflow-hidden rounded-lg">
-              <Image
-                src={`http://localhost:8080${product.image}`}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover transition-all duration-500 group-hover:scale-110 group-hover:rotate-1"
-                quality={100}
-                priority
-              />
-              {/* Image Overlay Effect */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
+            <Image
+              src={`http://localhost:8080${product.image}`}
+              alt={product.name}
+              width={300}
+              height={300}
+              className="object-cover rounded-lg mb-4"
+              quality={100}
+            />
 
             {/* Product Info */}
             <div className="flex flex-col flex-grow text-center">

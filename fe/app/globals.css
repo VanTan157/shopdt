@@ -148,3 +148,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  @apply font-sans bg-gray-100;
+}
+
+.container {
+  @apply max-w-6xl mx-auto;
+}
+
+#avatar-icon {
+  position: relative;
+}

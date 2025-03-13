@@ -8,13 +8,40 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ReqApi from "@/lib/ResApi";
+import ReqApi from "@/lib/ResApi"; // Giả sử đây là API client của bạn
+import { LogOut, ShoppingCart, UserRoundCog, WalletCards } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaUser } from "react-icons/fa";
+import { useEffect } from "react";
+import https from "@/lib/http";
+import { useCartStore } from "@/lib/cartStore";
 
 const MenuProfile = () => {
   const router = useRouter();
+  const { cartCount, setCartCount } = useCartStore(); // State để lưu số lượng giỏ hàng
+
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        const res = await https.get<{ count: number }>(
+          `/order-items/cart-count`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        ); // Giả sử API trả về { count: number }
+        setCartCount(res.count);
+      } catch (error) {
+        console.log("Error fetching cart count:", error);
+      }
+    };
+
+    fetchCartCount();
+  }, [setCartCount]);
+
   const handeleLogout = async () => {
     try {
       const res = await ReqApi.logout();
@@ -29,6 +56,13 @@ const MenuProfile = () => {
       }
     }
   };
+
+  // Hàm hiển thị số lượng giỏ hàng
+  const renderCartCount = () => {
+    if (cartCount > 5) return "5+";
+    return cartCount > 0 ? cartCount : null; // Không hiển thị nếu bằng 0
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -38,15 +72,34 @@ const MenuProfile = () => {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link href={"/profile"}>
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem>
+            <UserRoundCog className="mr-2" />
+            Profile
+          </DropdownMenuItem>
         </Link>
         <Link href={"/cart"}>
-          <DropdownMenuItem>Cart</DropdownMenuItem>
+          <DropdownMenuItem>
+            <div className="relative flex items-center space-x-3">
+              <ShoppingCart className="mr-4" />
+              Cart
+              {renderCartCount() && (
+                <span className="absolute top-0 left-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">
+                  {renderCartCount()}
+                </span>
+              )}
+            </div>
+          </DropdownMenuItem>
         </Link>
         <Link href={"/order"}>
-          <DropdownMenuItem>Order</DropdownMenuItem>
+          <DropdownMenuItem>
+            <WalletCards className="mr-2" />
+            Order
+          </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem onClick={handeleLogout}>Logout</DropdownMenuItem>
+        <DropdownMenuItem onClick={handeleLogout}>
+          <LogOut className="mr-2" />
+          Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -131,13 +131,27 @@ export class OrderService {
 
   async remove(id: string): Promise<Order> {
     if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException(`Invalid OrderItem ID: ${id}`);
+      throw new NotFoundException(`Invalid Order ID: ${id}`);
     }
-    const order = await this.orderModel.findByIdAndDelete(id).exec();
+
+    // Tìm Order cần xóa
+    const order = await this.orderModel.findById(id).exec();
     if (!order) {
       throw new NotFoundException("Order not found");
     }
-    return order;
+
+    // Xóa tất cả OrderItem liên quan
+    const orderItemIds = order.orderitem_ids.map((id) => id.toString());
+    await Promise.all(
+      orderItemIds.map(async (orderItemId) => {
+        await this.orderItemsService.remove(orderItemId);
+      })
+    );
+
+    // Xóa Order sau khi đã xóa các OrderItem
+    await this.orderModel.findByIdAndDelete(id).exec();
+
+    return order; // Trả về Order đã xóa
   }
 
   async getByUser(id: string) {

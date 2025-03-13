@@ -12,23 +12,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { CartCreateType, ProductType } from "../validate";
 import https from "@/lib/http";
 import { toast } from "sonner";
-
+import { useCartStore } from "@/lib/cartStore";
 interface Product {
   product: ProductType;
 }
 
-const BtnBuyNow = ({ product }: Product) => {
+const BtnAddCart = ({ product }: Product) => {
   const [quantity, setQuantity] = useState(1);
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
+  const cartIconRef = useRef<HTMLDivElement | null>(null);
+  const { incrementCartCount } = useCartStore();
 
   const handleBuyNow = async () => {
     try {
-      const res = await https.post<CartCreateType>(
+      const res = https.post<CartCreateType>(
         "/order-items",
         {
           headers: {
@@ -38,23 +38,36 @@ const BtnBuyNow = ({ product }: Product) => {
         },
         { product_id: product._id, quantity }
       );
-      const orderitem_ids = [res._id];
-      console.log(orderitem_ids);
-      await https.post(
-        `/order`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        },
-        {
-          orderitem_ids: [res._id],
-          address,
-          phone_number: phone,
+      console.log(res);
+      incrementCartCount(quantity);
+      toast.success("Thêm vào giỏ hàng thành công");
+
+      // Tạo hiệu ứng chuyển động
+      const cartIcon = cartIconRef.current;
+      if (cartIcon) {
+        const clone = cartIcon.cloneNode(true) as HTMLElement;
+        clone.style.position = "fixed";
+        clone.style.top = `${cartIcon.getBoundingClientRect().top}px`;
+        clone.style.left = `${cartIcon.getBoundingClientRect().left}px`;
+        clone.style.zIndex = "1000";
+        document.body.appendChild(clone);
+
+        const avatarIcon = document.querySelector("#avatar-icon");
+        if (avatarIcon) {
+          const avatarRect = avatarIcon.getBoundingClientRect();
+          clone.style.transition = "all 1s ease";
+          clone.style.transform = `translate(${
+            avatarRect.left - cartIcon.getBoundingClientRect().left
+          }px, ${
+            avatarRect.top - cartIcon.getBoundingClientRect().top
+          }px) scale(0.1)`;
+          clone.style.opacity = "0";
+
+          setTimeout(() => {
+            document.body.removeChild(clone);
+          }, 1000);
         }
-      );
-      toast.success("Đặt hàng thành công");
+      }
     } catch (error) {
       if (error instanceof Error) {
         console.log("Error:", error.message);
@@ -65,23 +78,30 @@ const BtnBuyNow = ({ product }: Product) => {
   };
 
   const handleConfirmPurchase = () => {
-    console.log({ product, quantity, address, phone });
+    console.log({ product, quantity });
     setQuantity(1);
-    setAddress("");
-    setPhone("");
     handleBuyNow();
   };
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
-          Mua ngay
+        <Button className="bg-gray-200 text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+          Thêm vào giỏ hàng
+          <div ref={cartIconRef} className="inline-block ml-2">
+            <Image
+              src={`http://localhost:8080${product.image}`}
+              alt={product.name}
+              width={24}
+              height={24}
+              className="object-cover rounded-full"
+            />
+          </div>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Thông tin mua hàng</AlertDialogTitle>
+          <AlertDialogTitle>Thông tin thêm hàng</AlertDialogTitle>
         </AlertDialogHeader>
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
@@ -112,36 +132,11 @@ const BtnBuyNow = ({ product }: Product) => {
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Địa chỉ
-            </label>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Nhập địa chỉ nhận hàng"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Số điện thoại
-            </label>
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Nhập số điện thoại"
-            />
-          </div>
         </div>
         <AlertDialogFooter>
           <AlertDialogCancel>Hủy</AlertDialogCancel>
           <AlertDialogAction onClick={handleConfirmPurchase}>
-            Xác nhận mua
+            Xác nhận
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -149,4 +144,4 @@ const BtnBuyNow = ({ product }: Product) => {
   );
 };
 
-export default BtnBuyNow;
+export default BtnAddCart;

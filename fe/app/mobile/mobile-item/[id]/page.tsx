@@ -2,6 +2,7 @@ import { ProductType } from "@/app/validate";
 import https from "@/lib/http";
 import Image from "next/image";
 import BtnBuyNow from "../../btn-buy-now";
+import BtnAddCart from "../../btn-add-cart";
 
 const Page = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
@@ -25,7 +26,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <div className="container mx-auto px-6 md:px-12 lg:px-20 py-8">
+    <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="flex justify-center">
           <Image
@@ -46,9 +47,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
           </p>
           <div className="flex space-x-4">
             <BtnBuyNow product={product} />
-            <button className="bg-gray-200 text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
-              Thêm vào giỏ hàng
-            </button>
+            <BtnAddCart product={product} />
           </div>
         </div>
       </div>

@@ -29,6 +29,13 @@ interface User {
 export class OrderItemsController {
   constructor(private readonly orderItemsService: OrderItemsService) {}
 
+  @Get("cart-count")
+  async getCartCount(@Req() req: Request) {
+    const userId = (req.user as User).userId;
+    const cartItems = await this.orderItemsService.getOrderNotInCart(userId);
+    return { count: cartItems.length }; // Trả về số lượng
+  }
+
   @Post()
   create(@Body() createOrderItemDto: CreateOrderItemDto, @Req() req: Request) {
     const userId = (req.user as User).userId;
