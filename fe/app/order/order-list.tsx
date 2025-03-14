@@ -11,11 +11,9 @@ const OrderList = ({ orders }: OrderNavProps) => {
       <h1 className="text-2xl font-bold mb-6 text-gray-900">
         Đơn hàng của bạn
       </h1>
-      {orders.length === 0 ? (
-        <p className="text-center text-gray-500">Trống</p>
-      ) : (
+      {orders.length > 0 ? (
         <div className="space-y-8">
-          {orders.map((order) => (
+          {orders?.map((order) => (
             <div
               key={order._id}
               className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
@@ -87,6 +85,8 @@ const OrderList = ({ orders }: OrderNavProps) => {
             </div>
           ))}
         </div>
+      ) : (
+        <p className="text-center text-gray-500">Trống</p>
       )}
     </div>
   );

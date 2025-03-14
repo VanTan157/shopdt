@@ -169,9 +169,6 @@ export class OrderService {
         },
       })
       .exec();
-    if (!order.length) {
-      throw new NotFoundException("No orders found for this user");
-    }
     return order;
   }
 

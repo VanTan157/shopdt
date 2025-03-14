@@ -26,7 +26,7 @@ const BtnAddCart = ({ product }: Product) => {
   const cartIconRef = useRef<HTMLDivElement | null>(null);
   const { incrementCartCount } = useCartStore();
 
-  const handleBuyNow = async () => {
+  const handleAddCart = async () => {
     try {
       const res = https.post<CartCreateType>(
         "/order-items",
@@ -39,7 +39,7 @@ const BtnAddCart = ({ product }: Product) => {
         { product_id: product._id, quantity }
       );
       console.log(res);
-      incrementCartCount(quantity);
+      incrementCartCount(1);
       toast.success("Thêm vào giỏ hàng thành công");
 
       // Tạo hiệu ứng chuyển động
@@ -77,11 +77,11 @@ const BtnAddCart = ({ product }: Product) => {
     }
   };
 
-  const handleConfirmPurchase = () => {
-    console.log({ product, quantity });
-    setQuantity(1);
-    handleBuyNow();
-  };
+  // const handleConfirmPurchase = () => {
+  //   console.log({ product, quantity });
+  //   setQuantity(1);
+  //   handleBuyNow();
+  // };
 
   return (
     <AlertDialog>
@@ -111,6 +111,7 @@ const BtnAddCart = ({ product }: Product) => {
               width={64}
               height={64}
               className="object-cover rounded-lg border border-gray-300"
+              priority
             />
             <div>
               <p className="text-lg font-semibold">{product.name}</p>
@@ -135,7 +136,7 @@ const BtnAddCart = ({ product }: Product) => {
         </div>
         <AlertDialogFooter>
           <AlertDialogCancel>Hủy</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirmPurchase}>
+          <AlertDialogAction onClick={handleAddCart}>
             Xác nhận
           </AlertDialogAction>
         </AlertDialogFooter>
