@@ -7,7 +7,16 @@ export class Product extends Document {
   name: string;
 
   @Prop({ required: true })
-  price: number;
+  StartingPrice: number;
+
+  @Prop({ required: true, default: 0 })
+  promotion: number;
+
+  @Prop({ required: true, default: false })
+  IsPromotion: boolean;
+
+  @Prop({ required: true })
+  finalPrice: number;
 
   @Prop()
   description: string;

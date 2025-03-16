@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -29,6 +30,19 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("ADMIN") // Chỉ ADMIN được tạo user
+  @Get("search")
+  async searchUsers(
+    @Query("page") page: string = "1",
+    @Query("limit") limit: string = "5",
+    @Query("search") search?: string
+  ) {
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    return this.usersService.paginationSearch(pageNum, limitNum, search);
   }
 
   @Get(":id")

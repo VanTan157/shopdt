@@ -13,8 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useRef } from "react";
-import { CartCreateType, ProductType } from "../validate";
-import https from "@/lib/http";
+import { CartCreateType, ProductType } from "../../validate";
+import https, { HttpError } from "@/lib/http";
 import { toast } from "sonner";
 import { useCartStore } from "@/lib/cartStore";
 interface Product {
@@ -28,7 +28,7 @@ const BtnAddCart = ({ product }: Product) => {
 
   const handleAddCart = async () => {
     try {
-      const res = https.post<CartCreateType>(
+      const res = await https.post<CartCreateType>(
         "/order-items",
         {
           headers: {
@@ -69,8 +69,11 @@ const BtnAddCart = ({ product }: Product) => {
         }
       }
     } catch (error) {
-      if (error instanceof Error) {
-        console.log("Error:", error.message);
+      if (error instanceof HttpError) {
+        console.log("Error:", error.status);
+        if (error.status === 401) {
+          toast.error("Vui lòng đăng nhập để mua hàng");
+        }
       } else {
         console.log("Lỗi không xác định");
       }
@@ -116,7 +119,7 @@ const BtnAddCart = ({ product }: Product) => {
             <div>
               <p className="text-lg font-semibold">{product.name}</p>
               <p className="text-gray-600">
-                Giá: {product.price.toLocaleString()} VND
+                Giá: {product.finalPrice.toLocaleString()} VND
               </p>
             </div>
           </div>

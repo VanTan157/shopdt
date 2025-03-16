@@ -1,5 +1,12 @@
 import { Transform } from "class-transformer";
-import { IsString, IsNumber, IsNotEmpty, IsMongoId } from "class-validator";
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsMongoId,
+  IsBoolean,
+  IsOptional,
+} from "class-validator";
 
 export class CreateProductDto {
   @IsString()
@@ -8,8 +15,17 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @Transform(({ value }) => parseFloat(value)) // Chuyển chuỗi thành số
-  @IsNumber({}, { message: "price must be a number" })
-  price: number;
+  @IsNumber()
+  StartingPrice: number;
+
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
+  @IsNumber()
+  promotion: number;
+
+  @IsBoolean()
+  @IsOptional()
+  IsPromotion?: boolean;
 
   @IsString()
   description: string;

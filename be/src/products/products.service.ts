@@ -25,10 +25,21 @@ export class ProductsService {
       throw new NotFoundException("Product type không tồn tại");
     }
 
+    const promotion = createProductDto.promotion ?? 0;
+    const IsPromotion = promotion > 0;
+
+    const finalPrice =
+      createProductDto.StartingPrice -
+      promotion * createProductDto.StartingPrice;
+
     const productData = {
       ...createProductDto,
+      finalPrice,
+      promotion,
+      IsPromotion,
       image: file ? `/image/${file.filename}` : undefined, // Lưu đường dẫn tương đối
     };
+
     const newProduct = new this.productModel(productData);
     return newProduct.save();
   }
@@ -51,20 +62,50 @@ export class ProductsService {
     return product;
   }
 
-  async update(
-    id: string,
-    updateProductDto: UpdateProductDto
-  ): Promise<Product> {
+  async update(id: string, updateProductDto: UpdateProductDto) {
     if (!Types.ObjectId.isValid(id)) {
       throw new Error("ID không hợp lệ");
     }
-    const Product = await this.productModel
-      .findByIdAndUpdate({ _id: id }, { $set: updateProductDto }, { new: true })
-      .exec();
-    if (!Product) {
-      throw new Error("Không tìm thấy Product");
+
+    // Tìm sản phẩm và populate product_type_id
+    const product = await this.productModel.findById({ _id: id }).exec();
+
+    if (!product) {
+      throw new NotFoundException("Không tìm thấy Product");
     }
-    return Product;
+
+    // Lấy giá trị từ DTO, nếu undefined thì giữ nguyên giá trị cũ
+    const startingPrice =
+      updateProductDto.StartingPrice !== undefined
+        ? updateProductDto.StartingPrice
+        : product.StartingPrice;
+    const promotion =
+      updateProductDto.promotion !== undefined
+        ? updateProductDto.promotion
+        : product.promotion;
+
+    // Xác định IsPromotion: ưu tiên giá trị từ DTO, nếu không có thì dựa vào promotion
+    const isPromotion = promotion > 0;
+
+    // Tính finalPrice
+    const finalPrice = startingPrice - promotion * startingPrice;
+
+    // Cập nhật các trường của product
+    const updatedProduct = await this.productModel
+      .findByIdAndUpdate(
+        { _id: id },
+        {
+          ...updateProductDto,
+          finalPrice,
+          IsPromotion: isPromotion,
+          StartingPrice: startingPrice,
+          promotion,
+        },
+        { new: true }
+      )
+      .exec();
+
+    return updatedProduct;
   }
 
   async remove(id: string): Promise<Product> {

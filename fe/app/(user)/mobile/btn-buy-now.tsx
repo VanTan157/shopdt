@@ -13,8 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState } from "react";
-import { CartCreateType, ProductType } from "../validate";
-import https from "@/lib/http";
+import { CartCreateType, ProductType } from "../../validate";
+import https, { HttpError } from "@/lib/http";
 import { toast } from "sonner";
 
 interface Product {
@@ -56,8 +56,11 @@ const BtnBuyNow = ({ product }: Product) => {
       );
       toast.success("Đặt hàng thành công");
     } catch (error) {
-      if (error instanceof Error) {
-        console.log("Error:", error.message);
+      if (error instanceof HttpError) {
+        console.log("Error:", error.status);
+        if (error.status === 401) {
+          toast.error("Vui lòng đăng nhập để mua hàng");
+        }
       } else {
         console.log("Lỗi không xác định");
       }
@@ -95,7 +98,7 @@ const BtnBuyNow = ({ product }: Product) => {
             <div>
               <p className="text-lg font-semibold">{product.name}</p>
               <p className="text-gray-600">
-                Giá: {product.price.toLocaleString()} VND
+                Giá: {product.finalPrice.toLocaleString()} VND
               </p>
             </div>
           </div>

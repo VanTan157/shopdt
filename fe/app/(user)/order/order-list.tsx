@@ -1,5 +1,5 @@
+import { OrderType } from "@/app/validate";
 import Image from "next/image";
-import { OrderType } from "../validate";
 
 interface OrderNavProps {
   orders: OrderType[];
@@ -68,7 +68,8 @@ const OrderList = ({ orders }: OrderNavProps) => {
                             {item.product_id.name}
                           </p>
                           <p className="text-gray-500 text-xs">
-                            Giá: {item.product_id.price.toLocaleString()} VND
+                            Giá: {item.product_id.finalPrice.toLocaleString()}
+                            VND
                           </p>
                           <p className="text-gray-500 text-xs">
                             Số lượng: {item.quantity}

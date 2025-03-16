@@ -4,11 +4,27 @@ import { createContext, useContext, useState } from "react";
 
 const UserContext = createContext();
 
-export const UserProvider = ({ children, initialUser }) => {
+export const UserProvider = ({
+  children,
+  initialUser,
+  initialrefreshToken,
+  initialaccessToken,
+}) => {
   const [user, setUser] = useState(initialUser);
+  const [refreshToken, setRefreshToken] = useState(initialrefreshToken);
+  const [accessToken, setAccessToken] = useState(initialaccessToken);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        refreshToken,
+        setRefreshToken,
+        accessToken,
+        setAccessToken,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

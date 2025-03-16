@@ -1,7 +1,7 @@
 // pages/cart.tsx (hoặc đường dẫn tương ứng)
 import https from "@/lib/http";
 import { cookies } from "next/headers";
-import { CartType } from "../validate";
+import { CartType } from "../../validate";
 import CartClient from "./cart-client";
 // Import Client Component
 

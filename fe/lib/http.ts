@@ -5,6 +5,15 @@ type Option = {
   withCredentials?: boolean;
 };
 
+export class HttpError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 const res = async <Request>({
   method,
   body,
@@ -20,20 +29,26 @@ const res = async <Request>({
   const fullUrl = url.startsWith("/")
     ? `${baseUrl}${url}`
     : `${baseUrl}/${url}`;
+
+  // Kiểm tra xem body có phải là object rỗng hay không
+  const isEmptyObject =
+    body && typeof body === "object" && Object.keys(body).length === 0;
+  const requestBody = body && !isEmptyObject ? JSON.stringify(body) : undefined;
+
   try {
     const response = await fetch(fullUrl, {
       method,
-      body: body ? JSON.stringify(body) : undefined, // Avoid stringifying undefined
+      body: requestBody, // Sử dụng requestBody đã xử lý
       ...option,
     });
-    // if (!response.ok) {
-    //   const error = await response.json();
-    //   throw new Error(error.message || "Lỗi server"); // Throw the specific message
-    // }
+    if (!response.ok) {
+      const error = await response.json();
+      throw new HttpError(error.message || "Lỗi server", error.statusCode); // Throw the specific message
+    }
     const payload: Request = await response.json();
     return payload;
   } catch (error) {
-    if (error instanceof Error) {
+    if (error instanceof HttpError) {
       throw error; // Re-throw the error with the message intact
     } else {
       throw new Error("Lỗi server");

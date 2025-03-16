@@ -9,8 +9,7 @@ const useRefreshToken = () => {
   // Hàm gọi API refresh token
   const refreshToken = async () => {
     try {
-      const response = ReqApi.refreshToken();
-      console.log(response);
+      await ReqApi.refreshToken();
       setIsAuthenticated(true); // Xác nhận vẫn đăng nhập
     } catch (error) {
       console.error("Lỗi refresh token:", error);

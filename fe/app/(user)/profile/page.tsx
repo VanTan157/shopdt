@@ -1,11 +1,12 @@
 import ReqApi from "@/lib/ResApi";
 import { cookies } from "next/headers";
 import BtnEditProfile from "./btn-edit-profile";
+import { AccountType } from "@/app/validate";
 
 const Profile = async () => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
-  let user = null;
+  let user: AccountType | null = null;
   try {
     const res = await ReqApi.getMe(accessToken as string);
     user = res;

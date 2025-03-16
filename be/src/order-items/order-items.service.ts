@@ -46,13 +46,13 @@ export class OrderItemsService {
       throw new NotFoundException("Không tìm thấy sản phẩm");
     }
 
-    const total_price = quantity * product.price;
+    const total_price = quantity * product.finalPrice;
 
     const orderItem = new this.orderItemModel({
       user_id: userId,
       product_id,
       quantity,
-      unit_price: product.price,
+      unit_price: product.finalPrice,
       total_price,
     });
 
@@ -98,7 +98,7 @@ export class OrderItemsService {
       throw new NotFoundException("Không tìm thấy sản phẩm");
     }
 
-    const total_price = quantity * product.price;
+    const total_price = quantity * product.finalPrice;
     if (!Types.ObjectId.isValid(id)) {
       throw new NotFoundException("Id không hợp lệ");
     }

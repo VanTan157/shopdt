@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { CartType } from "../validate";
+import { CartType } from "../../validate";
 import https from "@/lib/http";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

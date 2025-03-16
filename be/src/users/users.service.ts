@@ -33,6 +33,53 @@ export class UsersService {
     return newUser.save();
   }
 
+  async paginationSearch(
+    page: number = 1, // Trang mặc định là 1
+    limit: number = 5, // Số lượng bản ghi mỗi trang mặc định là 10
+    search?: string // Từ khóa tìm kiếm (tùy chọn)
+  ): Promise<{
+    users: User[];
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+  }> {
+    // Chuẩn hóa tham số page và limit
+    const currentPage = Math.max(1, page); // Đảm bảo page không nhỏ hơn 1
+    const itemsPerPage = Math.max(1, limit); // Đảm bảo limit không nhỏ hơn 1
+    const skip = (currentPage - 1) * itemsPerPage; // Số bản ghi cần bỏ qua
+
+    // Điều kiện tìm kiếm
+    const query: any = {};
+    if (search) {
+      // Tìm kiếm không phân biệt hoa thường trên email hoặc name
+      query.$or = [
+        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Lấy tổng số bản ghi
+    const totalItems = await this.userModel.countDocuments(query).exec();
+
+    // Lấy danh sách người dùng với phân trang
+    const users = await this.userModel
+      .find(query)
+      .skip(skip)
+      .limit(itemsPerPage)
+      .exec();
+
+    // Tính tổng số trang
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // Trả về kết quả
+    return {
+      users,
+      totalItems,
+      totalPages,
+      currentPage,
+    };
+  }
+
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
   }

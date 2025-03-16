@@ -10,8 +10,6 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Order } from "./entities/order.entity";
 import { Model, Types } from "mongoose";
 import { OrderItemsService } from "src/order-items/order-items.service";
-import { ProductsService } from "src/products/products.service";
-import { OrderItem } from "src/order-items/entities/order-item.entity";
 
 @Injectable()
 export class OrderService {
