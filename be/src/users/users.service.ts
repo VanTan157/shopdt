@@ -35,7 +35,7 @@ export class UsersService {
 
   async paginationSearch(
     page: number = 1, // Trang mặc định là 1
-    limit: number = 5, // Số lượng bản ghi mỗi trang mặc định là 10
+    limit: number = 10, // Số lượng bản ghi mỗi trang mặc định là 10
     search?: string // Từ khóa tìm kiếm (tùy chọn)
   ): Promise<{
     users: User[];

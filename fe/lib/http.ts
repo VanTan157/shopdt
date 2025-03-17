@@ -51,7 +51,7 @@ const res = async <Request>({
     if (error instanceof HttpError) {
       throw error; // Re-throw the error with the message intact
     } else {
-      throw new Error("Lỗi server");
+      throw new Error("Lỗi server!!!");
     }
   }
 };

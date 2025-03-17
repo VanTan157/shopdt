@@ -37,7 +37,7 @@ export class UsersController {
   @Get("search")
   async searchUsers(
     @Query("page") page: string = "1",
-    @Query("limit") limit: string = "5",
+    @Query("limit") limit: string = "10",
     @Query("search") search?: string
   ) {
     const pageNum = parseInt(page, 10);

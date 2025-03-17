@@ -1,0 +1,31 @@
+import ReqApi from "@/lib/ResApi";
+import Link from "next/link";
+
+const ProductTypesList = async () => {
+  let product_types = null;
+  try {
+    product_types = await ReqApi.getAllMobileType();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    } else {
+      console.log("Lỗi không xác định");
+    }
+  }
+  return (
+    <div>
+      {/* <TypesList /> */}
+      <div className="flex space-x-4 border-b-2">
+        {product_types?.map((product_type) => (
+          <div key={product_type._id}>
+            <Link href={`/admin/products/mobiles/${product_type.type}`}>
+              {product_type.type}
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default ProductTypesList;

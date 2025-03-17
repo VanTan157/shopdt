@@ -9,15 +9,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ReqApi from "@/lib/ResApi"; // Giả sử đây là API client của bạn
-import { LogOut, ShoppingCart, UserRoundCog, WalletCards } from "lucide-react";
+import {
+  LogOut,
+  ShieldCheck,
+  ShoppingCart,
+  UserRoundCog,
+  WalletCards,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaUser } from "react-icons/fa";
 import { useEffect } from "react";
 import https from "@/lib/http";
 import { useCartStore } from "@/lib/cartStore";
+import { AccountType } from "@/app/validate";
 
-const MenuProfile = () => {
+const MenuProfile = ({ user }: { user: AccountType }) => {
   const router = useRouter();
   const { cartCount, setCartCount } = useCartStore(); // State để lưu số lượng giỏ hàng
 
@@ -71,6 +78,14 @@ const MenuProfile = () => {
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {user.type === "ADMIN" && (
+          <Link href={"/admin"}>
+            <DropdownMenuItem>
+              <ShieldCheck className="mr-2" />
+              Admin
+            </DropdownMenuItem>
+          </Link>
+        )}
         <Link href={"/profile"}>
           <DropdownMenuItem>
             <UserRoundCog className="mr-2" />

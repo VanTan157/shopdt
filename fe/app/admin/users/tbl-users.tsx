@@ -24,7 +24,6 @@ const TblUsers = ({
   const router = useRouter();
 
   const handlePageChange = (page: number) => {
-    // Tạo URL mới với tham số page, giữ nguyên các tham số khác (nếu có)
     const params = new URLSearchParams(window.location.search);
     params.set("page", page.toString());
     router.push(`?${params.toString()}`);
@@ -36,16 +35,16 @@ const TblUsers = ({
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-100 border-b">
-              <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
                 Email
               </th>
-              <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
                 Name
               </th>
-              <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
                 Type
               </th>
-              <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
                 Actions
               </th>
             </tr>
@@ -53,10 +52,10 @@ const TblUsers = ({
           <tbody>
             {users.map((item, index) => (
               <tr key={index} className="border-b hover:bg-gray-50">
-                <td className="py-3 px-4 text-gray-800">{item.email}</td>
-                <td className="py-3 px-4 text-gray-800">{item.name}</td>
-                <td className="py-3 px-4 text-gray-800">{item.type}</td>
-                <td className="py-3 px-4 flex space-x-2">
+                <td className="py-1 px-4 text-gray-800">{item.email}</td>
+                <td className="py-1 px-4 text-gray-800">{item.name}</td>
+                <td className="py-1 px-4 text-gray-800">{item.type}</td>
+                <td className="py-1 px-4 flex space-x-2">
                   <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
                     Edit
                   </button>
@@ -69,42 +68,45 @@ const TblUsers = ({
           </tbody>
         </table>
       </div>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                if (currentPage > 1) handlePageChange(currentPage - 1);
-              }}
-            />
-          </PaginationItem>
-          {[...Array(totalPages).keys()].map((i) => (
-            <PaginationItem key={i}>
-              <PaginationLink
+      <div className="fixed bottom-2 left-1/2 transform -translate-x-1/2">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
                 href="#"
-                isActive={currentPage === i + 1}
                 onClick={(e) => {
                   e.preventDefault();
-                  handlePageChange(i + 1);
+                  if (currentPage > 1) handlePageChange(currentPage - 1);
                 }}
-              >
-                {i + 1}
-              </PaginationLink>
+              />
             </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                if (currentPage < totalPages) handlePageChange(currentPage + 1);
-              }}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+            {[...Array(totalPages).keys()].map((i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  isActive={currentPage === i + 1}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageChange(i + 1);
+                  }}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage < totalPages)
+                    handlePageChange(currentPage + 1);
+                }}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 };

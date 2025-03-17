@@ -1,4 +1,5 @@
-import AdminHeader from "./admin-header";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export default async function AdminLayout({
   children,
@@ -6,11 +7,12 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
-      <div>
-        <AdminHeader />
-        {children}
+    <SidebarProvider>
+      <div className="flex w-full">
+        <AppSidebar admin={true} />
+        <SidebarTrigger />
+        <main className="flex-1">{children}</main>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

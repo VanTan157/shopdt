@@ -2,10 +2,20 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import MenuProfile from "./menu-profile";
 import { SidebarTrigger } from "./ui/sidebar";
+import { AccountType } from "@/app/validate";
+import ReqApi from "@/lib/ResApi";
 
 const Header = async () => {
   const cookieStore = await cookies();
   const access_token = cookieStore.get("accessToken");
+  let user: AccountType | null = null;
+  try {
+    user = await ReqApi.getMe(access_token?.value || "");
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    } else console.log("Lỗi không xác định");
+  }
 
   return (
     <header className="fixed top-0 left-0 w-full z-20 bg-gray-900 text-white shadow-lg">
@@ -20,7 +30,7 @@ const Header = async () => {
         </div>
         {access_token ? (
           <div className="pr-4" id="avatar-icon">
-            <MenuProfile />
+            {user && <MenuProfile user={user} />}
           </div>
         ) : (
           <div className="flex space-x-6 pr-4">

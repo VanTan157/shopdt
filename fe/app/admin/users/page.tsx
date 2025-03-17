@@ -6,16 +6,17 @@ import { DiamondPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const UserPage = async ({
-  searchParams,
+  searchParams: rawSearchParams,
 }: {
   searchParams: { page?: string; limit?: string; search?: string };
 }) => {
+  const searchParams = await Promise.resolve(rawSearchParams);
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
   // Lấy các tham số từ query string (nếu không có thì dùng mặc định)
   const page = searchParams.page || "1";
-  const limit = searchParams.limit || "5";
+  const limit = searchParams.limit || "10";
   const search = searchParams.search || "";
 
   let paginationData: {
