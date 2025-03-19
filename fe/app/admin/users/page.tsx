@@ -2,8 +2,7 @@ import { AccountType } from "@/app/validate";
 import https, { HttpError } from "@/lib/http";
 import { cookies } from "next/headers";
 import TblUsers from "./tbl-users";
-import { DiamondPlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import BtnAdd from "./btn-add";
 
 const UserPage = async ({
   searchParams: rawSearchParams,
@@ -16,7 +15,7 @@ const UserPage = async ({
 
   // Lấy các tham số từ query string (nếu không có thì dùng mặc định)
   const page = searchParams.page || "1";
-  const limit = searchParams.limit || "10";
+  const limit = searchParams.limit || "9";
   const search = searchParams.search || "";
 
   let paginationData: {
@@ -49,11 +48,8 @@ const UserPage = async ({
 
   return (
     <div>
-      <div className="pl-8 pt-4">
-        <Button className="flex bg-green-500 hover:bg-green-600">
-          <DiamondPlus />
-          Thêm user
-        </Button>
+      <div className="pl-8 py-4">
+        <BtnAdd />
       </div>
       {paginationData && <TblUsers paginationData={paginationData} />}
     </div>

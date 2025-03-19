@@ -9,6 +9,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useRouter } from "next/navigation";
+import BtnEdit from "./btn-edit";
+import BtnDelete from "./btn-delete";
 
 const TblUsers = ({
   paginationData,
@@ -30,21 +32,21 @@ const TblUsers = ({
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-2">
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-100 border-b">
-              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-1 px-4 text-left text-sm font-semibold text-gray-700">
                 Email
               </th>
-              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-1 px-4 text-left text-sm font-semibold text-gray-700">
                 Name
               </th>
-              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-1 px-4 text-left text-sm font-semibold text-gray-700">
                 Type
               </th>
-              <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">
+              <th className="py-1 px-4 text-left text-sm font-semibold text-gray-700">
                 Actions
               </th>
             </tr>
@@ -56,12 +58,8 @@ const TblUsers = ({
                 <td className="py-1 px-4 text-gray-800">{item.name}</td>
                 <td className="py-1 px-4 text-gray-800">{item.type}</td>
                 <td className="py-1 px-4 flex space-x-2">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
-                    Edit
-                  </button>
-                  <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
-                    Delete
-                  </button>
+                  <BtnEdit user={item} />
+                  <BtnDelete user={item} />
                 </td>
               </tr>
             ))}

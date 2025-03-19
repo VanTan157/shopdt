@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { AccountType } from "../validate";
+import { AccountType } from "@/app/validate";
 import https from "@/lib/http";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

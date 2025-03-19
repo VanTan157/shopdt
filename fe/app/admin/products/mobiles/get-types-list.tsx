@@ -5,6 +5,7 @@ const ProductTypesList = async () => {
   let product_types = null;
   try {
     product_types = await ReqApi.getAllMobileType();
+    console.log(product_types);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
@@ -18,7 +19,7 @@ const ProductTypesList = async () => {
       <div className="flex space-x-4 border-b-2">
         {product_types?.map((product_type) => (
           <div key={product_type._id}>
-            <Link href={`/admin/products/mobiles/${product_type.type}`}>
+            <Link href={`/admin/products/mobiles/${product_type._id}`}>
               {product_type.type}
             </Link>
           </div>

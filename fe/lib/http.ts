@@ -63,6 +63,8 @@ const https = {
     res<Request>({ method: "POST", body, url, option: options }),
   put: <Request>(url: string, options: Option, body: unknown) =>
     res<Request>({ method: "PUT", body, url, option: options }),
+  patch: <Request>(url: string, options: Option, body: unknown) =>
+    res<Request>({ method: "PATCH", body, url, option: options }),
   delete: <Request>(url: string, options: Option) =>
     res<Request>({ method: "DELETE", url, option: options }),
 };

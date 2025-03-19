@@ -1,4 +1,4 @@
-import { Product } from "./../products/entities/product.entity";
+import { Product } from "../mobiles/entities/product.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
