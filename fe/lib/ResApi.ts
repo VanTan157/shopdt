@@ -2,8 +2,8 @@ import {
   AccountType,
   LoginResType,
   LoginType,
-  ProductTType,
-  ProductType,
+  MobileTType,
+  MobileType,
   RegisterResType,
   RegisterType,
 } from "@/app/validate";
@@ -60,19 +60,19 @@ const ReqApi = {
       },
     }),
   getAllMobile: async () =>
-    https.get<ProductType[]>(`/products`, {
+    https.get<MobileType[]>(`/mobiles`, {
       headers: {
         "Content-Type": "application/json",
       },
     }),
   getAllMobilebyType: async (id: string) =>
-    https.get<ProductType[]>(`/products/type/${id}`, {
+    https.get<MobileType[]>(`/mobiles/type/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },
     }),
   getAllMobileType: async () =>
-    https.get<ProductTType[]>(`/product-types`, {
+    https.get<MobileTType[]>(`/mobile-types`, {
       headers: {
         "Content-Type": "application/json",
       },

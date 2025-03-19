@@ -1,10 +1,75 @@
-import { ProductType } from "@/app/validate";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+"use client";
 
-const MobileTable = ({ mobiles }: { mobiles: ProductType[] }) => {
+import { MobileType } from "@/app/validate";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Image from "next/image";
+import { useState } from "react";
+
+const MobileTable = ({ mobiles }: { mobiles: MobileType[] }) => {
+  const [promotionFilter, setPromotionFilter] = useState<string>("all"); // Bộ lọc mặc định là "Tất cả"
+  const [searchName, setSearchName] = useState<string>("");
+
+  // Hàm lọc danh sách sản phẩm dựa trên promotionFilter
+  const filteredMobiles = mobiles.filter((mobile) => {
+    // Lọc theo khuyến mãi
+    const matchesPromotion =
+      promotionFilter === "all" ||
+      (promotionFilter === "yes" && mobile.IsPromotion) ||
+      (promotionFilter === "no" && !mobile.IsPromotion);
+
+    // Lọc theo tên sản phẩm
+    const matchesSearch = mobile.name
+      .toLowerCase()
+      .includes(searchName.toLowerCase());
+
+    return matchesPromotion && matchesSearch;
+  });
+
+  const handleFilterChange = (value: string) => {
+    setPromotionFilter(value);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchName(e.target.value);
+  };
+
   return (
     <div className="overflow-x-auto pr-4 pt-4">
+      <div className="mb-4 flex items-center space-x-4">
+        {/* Bộ lọc Khuyến mãi */}
+        <div className="flex items-center space-x-2">
+          <label className="text-lg font-medium">Khuyến mãi:</label>
+          <Select value={promotionFilter} onValueChange={handleFilterChange}>
+            <SelectTrigger className="w-40 h-10">
+              <SelectValue placeholder="Chọn bộ lọc" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="yes">Có</SelectItem>
+              <SelectItem value="no">Không</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Thanh tìm kiếm */}
+        <div className="flex items-center space-x-2">
+          <label className="text-lg font-medium">Tìm kiếm:</label>
+          <Input
+            value={searchName}
+            onChange={handleSearchChange}
+            placeholder="Nhập tên sản phẩm..."
+            className="w-64 h-10"
+          />
+        </div>
+      </div>
       <table className="min-w-full border-collapse border border-gray-200">
         <thead>
           <tr className="bg-gray-100">
@@ -33,7 +98,7 @@ const MobileTable = ({ mobiles }: { mobiles: ProductType[] }) => {
           </tr>
         </thead>
         <tbody>
-          {mobiles.map((mobile) => (
+          {filteredMobiles.map((mobile) => (
             <tr key={mobile._id} className="hover:bg-gray-50">
               {/* Hình ảnh */}
               <td className="border border-gray-200 px-4 py-2">

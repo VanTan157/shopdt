@@ -56,8 +56,8 @@ const OrderList = ({ orders }: OrderNavProps) => {
                     >
                       <div className="flex items-center space-x-4">
                         <Image
-                          src={`http://localhost:8080${item.product_id.image}`}
-                          alt={item.product_id.name}
+                          src={`http://localhost:8080${item.mobile_id.image}`}
+                          alt={item.mobile_id.name}
                           width={60}
                           height={60}
                           className="object-cover rounded"
@@ -65,10 +65,10 @@ const OrderList = ({ orders }: OrderNavProps) => {
                         />
                         <div>
                           <p className="text-gray-800 font-medium">
-                            {item.product_id.name}
+                            {item.mobile_id.name}
                           </p>
                           <p className="text-gray-500 text-xs">
-                            Giá: {item.product_id.finalPrice.toLocaleString()}
+                            Giá: {item.mobile_id.finalPrice.toLocaleString()}
                             VND
                           </p>
                           <p className="text-gray-500 text-xs">

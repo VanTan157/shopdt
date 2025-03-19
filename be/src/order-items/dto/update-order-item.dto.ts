@@ -1,16 +1,10 @@
 import { Transform } from "class-transformer";
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-} from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Min } from "class-validator";
 
 export class UpdateOrderItemDto {
   @IsNotEmpty()
   @IsString()
-  product_id: string;
+  mobile_id: string;
 
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value, 10)) // Chuyển chuỗi thành số nguyên

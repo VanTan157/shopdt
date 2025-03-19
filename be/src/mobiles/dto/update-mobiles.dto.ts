@@ -7,18 +7,18 @@ import {
   IsString,
 } from "class-validator";
 
-export class UpdateProductDto {
+export class UpdateMobileDto {
   @IsString()
   @IsOptional()
   name: string;
 
   @IsOptional()
-  @Transform(({ value }) => parseFloat(value)) // Chuyển chuỗi thành số
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
   StartingPrice: number;
 
   @IsOptional()
-  @Transform(({ value }) => parseFloat(value)) // Chuyển chuỗi thành số
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
   promotion: number;
 
@@ -32,5 +32,5 @@ export class UpdateProductDto {
 
   @IsMongoId()
   @IsOptional()
-  product_type_id: string;
+  mobile_type_id: string; // Thay product_type_id thành mobile_type_id
 }

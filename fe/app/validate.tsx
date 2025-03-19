@@ -33,7 +33,7 @@ export const resRegister = z.object({
 });
 export type RegisterResType = z.infer<typeof resRegister>;
 
-export const Product = z.object({
+export const Mobile = z.object({
   _id: z.string(),
   name: z.string(),
   StartingPrice: z.number(),
@@ -42,18 +42,18 @@ export const Product = z.object({
   IsPromotion: z.boolean(),
   description: z.string(),
   image: z.string(),
-  product_type: z.object({
+  mobile_type: z.object({
     _id: z.string(),
     type: z.string(),
   }),
 });
-export type ProductType = z.infer<typeof Product>;
+export type MobileType = z.infer<typeof Mobile>;
 
-export const ProductT = z.object({
+export const MobileT = z.object({
   _id: z.string(),
   type: z.string(),
 });
-export type ProductTType = z.infer<typeof ProductT>;
+export type MobileTType = z.infer<typeof MobileT>;
 
 export const account = z.object({
   _id: z.string(),
@@ -66,7 +66,7 @@ export type AccountType = z.infer<typeof account>;
 export const cart = z.object({
   _id: z.string(),
   user_id: z.string(),
-  product_id: z.object({
+  mobile_id: z.object({
     _id: z.string(),
     name: z.string(),
     StartingPrice: z.number(),

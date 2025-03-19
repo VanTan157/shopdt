@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, IsNumber, Min } from "class-validator";
 export class CreateOrderItemDto {
   @IsNotEmpty()
   @IsString()
-  product_id: string;
+  mobile_id: string;
 
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value, 10)) // Chuyển chuỗi thành số nguyên

@@ -15,7 +15,6 @@ const ProductTypesList = async () => {
   }
   return (
     <div>
-      {/* <TypesList /> */}
       <div className="flex space-x-4 border-b-2">
         {product_types?.map((product_type) => (
           <div key={product_type._id}>

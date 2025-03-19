@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { register, RegisterType } from "../validate";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import ReqApi from "@/lib/ResApi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { register, RegisterType } from "@/app/validate";
 
 export function RegisterForm() {
   const router = useRouter();

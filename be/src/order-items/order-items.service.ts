@@ -9,14 +9,14 @@ import { UpdateOrderItemDto } from "./dto/update-order-item.dto";
 import { Model, Types } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { OrderItem } from "./entities/order-item.entity";
-import { ProductsService } from "src/mobiles/products.service";
 import { OrderService } from "src/order/order.service";
+import { MobilesService } from "src/mobiles/mobiles.service";
 
 @Injectable()
 export class OrderItemsService {
   constructor(
     @InjectModel(OrderItem.name) private orderItemModel: Model<OrderItem>,
-    private productsService: ProductsService,
+    private mobilesService: MobilesService,
     @Inject(forwardRef(() => OrderService))
     private orderService: OrderService
   ) {}
@@ -31,28 +31,28 @@ export class OrderItemsService {
     );
     return this.orderItemModel
       .find({ user_id: userId, _id: { $nin: usedOrderItemIds } })
-      .populate("product_id")
+      .populate("mobile_id")
       .exec();
   }
 
   async create(createOrderItemDto: CreateOrderItemDto, userId) {
-    const { product_id, quantity } = createOrderItemDto;
-    if (!Types.ObjectId.isValid(product_id)) {
+    const { mobile_id, quantity } = createOrderItemDto;
+    if (!Types.ObjectId.isValid(mobile_id)) {
       throw new NotFoundException("Id sản phẩm không hợp lệ");
     }
 
-    const product = await this.productsService.findOne(product_id); // Sửa chính tả
-    if (!product) {
+    const mobile = await this.mobilesService.findOne(mobile_id); // Sửa chính tả
+    if (!mobile) {
       throw new NotFoundException("Không tìm thấy sản phẩm");
     }
 
-    const total_price = quantity * product.finalPrice;
+    const total_price = quantity * mobile.finalPrice;
 
     const orderItem = new this.orderItemModel({
       user_id: userId,
-      product_id,
+      mobile_id,
       quantity,
-      unit_price: product.finalPrice,
+      unit_price: mobile.finalPrice,
       total_price,
     });
 
@@ -60,7 +60,7 @@ export class OrderItemsService {
   }
 
   async findAll() {
-    return this.orderItemModel.find().populate("product_id").exec();
+    return this.orderItemModel.find().populate("mobile_id").exec();
   }
 
   async findOne(id: string) {
@@ -69,7 +69,7 @@ export class OrderItemsService {
     }
     const orderItem = await this.orderItemModel
       .findById(id)
-      .populate("product_id")
+      .populate("mobile_id")
       .exec();
     if (!orderItem) throw new NotFoundException("OrderItem not found");
     return orderItem;
@@ -81,24 +81,24 @@ export class OrderItemsService {
     }
     const orderItem = await this.orderItemModel
       .find({ user_id: id })
-      .populate("product_id")
+      .populate("mobile_id")
       .exec();
     if (!orderItem) throw new NotFoundException("User not found");
     return orderItem;
   }
 
   async update(id: string, updateOrderItemDto: UpdateOrderItemDto) {
-    const { product_id, quantity } = updateOrderItemDto;
-    if (!Types.ObjectId.isValid(product_id)) {
+    const { mobile_id, quantity } = updateOrderItemDto;
+    if (!Types.ObjectId.isValid(mobile_id)) {
       throw new NotFoundException("Id sản phẩm không hợp lệ");
     }
 
-    const product = await this.productsService.findOne(product_id); // Sửa chính tả
-    if (!product) {
+    const mobile = await this.mobilesService.findOne(mobile_id); // Sửa chính tả
+    if (!mobile) {
       throw new NotFoundException("Không tìm thấy sản phẩm");
     }
 
-    const total_price = quantity * product.finalPrice;
+    const total_price = quantity * mobile.finalPrice;
     if (!Types.ObjectId.isValid(id)) {
       throw new NotFoundException("Id không hợp lệ");
     }
@@ -108,7 +108,7 @@ export class OrderItemsService {
         { ...updateOrderItemDto, total_price },
         { new: true }
       )
-      .populate("product_id")
+      .populate("mobile_id")
       .exec();
     if (!orderItem) throw new NotFoundException("OrderItem not found");
     return orderItem;

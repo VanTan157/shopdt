@@ -2,12 +2,12 @@
 
 import React from "react";
 import Image from "next/image";
-import { ProductType } from "../../validate";
 import { useSidebar } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { MobileType } from "@/app/validate";
 
 interface ProductListProps {
-  products: ProductType[];
+  products: MobileType[];
 }
 
 const ProductList: React.FC<ProductListProps> = ({ products }) => {

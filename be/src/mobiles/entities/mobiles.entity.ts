@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
 @Schema()
-export class Product extends Document {
+export class Mobile extends Document {
   @Prop({ required: true })
   name: string;
 
@@ -24,8 +24,8 @@ export class Product extends Document {
   @Prop()
   image: string;
 
-  @Prop({ type: Types.ObjectId, ref: "ProductType", required: true })
-  product_type_id: Types.ObjectId; // Liên kết với ProductType
+  @Prop({ type: Types.ObjectId, ref: "MobileType", required: true }) // Thay ProductType thành MobileType
+  mobile_type_id: Types.ObjectId; // Thay product_type_id thành mobile_type_id
 }
 
-export const ProductSchema = SchemaFactory.createForClass(Product);
+export const MobileSchema = SchemaFactory.createForClass(Mobile);

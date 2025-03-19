@@ -20,6 +20,7 @@ type CartClientProps = {
 };
 
 const CartClient = ({ initialCarts }: CartClientProps) => {
+  console.log(initialCarts);
   const router = useRouter();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { decrementCartCount } = useCartStore();
@@ -112,8 +113,8 @@ const CartClient = ({ initialCarts }: CartClientProps) => {
               >
                 <div className="relative w-32 h-32 flex-shrink-0">
                   <Image
-                    src={`http://localhost:8080${item.product_id.image}`}
-                    alt={item.product_id.name}
+                    src={`http://localhost:8080${item.mobile_id.image}`}
+                    alt={item.mobile_id.name}
                     fill
                     sizes="100px"
                     className="object-cover rounded-lg transition-transform duration-300 hover:scale-105"
@@ -122,7 +123,7 @@ const CartClient = ({ initialCarts }: CartClientProps) => {
                 </div>
                 <div className="flex-1 ml-4">
                   <h2 className="text-xl font-semibold">
-                    {item.product_id.name}
+                    {item.mobile_id.name}
                   </h2>
                   <p className="text-gray-700">
                     Unit Price: {item.unit_price.toLocaleString()} VNĐ

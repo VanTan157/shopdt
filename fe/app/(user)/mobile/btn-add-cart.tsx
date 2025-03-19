@@ -13,12 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useRef } from "react";
-import { CartCreateType, ProductType } from "../../validate";
+import { CartCreateType, MobileType } from "../../validate";
 import https, { HttpError } from "@/lib/http";
 import { toast } from "sonner";
 import { useCartStore } from "@/lib/cartStore";
 interface Product {
-  product: ProductType;
+  product: MobileType;
 }
 
 const BtnAddCart = ({ product }: Product) => {
@@ -36,7 +36,7 @@ const BtnAddCart = ({ product }: Product) => {
           },
           credentials: "include",
         },
-        { product_id: product._id, quantity }
+        { mobile_id: product._id, quantity }
       );
       console.log(res);
       incrementCartCount(1);

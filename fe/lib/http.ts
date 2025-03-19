@@ -1,6 +1,6 @@
 type Option = {
   url?: string;
-  headers: HeadersInit;
+  headers?: HeadersInit;
   credentials?: RequestCredentials;
   withCredentials?: boolean;
 };
@@ -30,26 +30,29 @@ const res = async <Request>({
     ? `${baseUrl}${url}`
     : `${baseUrl}/${url}`;
 
-  // Kiểm tra xem body có phải là object rỗng hay không
-  const isEmptyObject =
-    body && typeof body === "object" && Object.keys(body).length === 0;
-  const requestBody = body && !isEmptyObject ? JSON.stringify(body) : undefined;
+  // Kiểm tra nếu body là FormData thì không chuyển thành JSON
+  const requestBody =
+    body instanceof FormData
+      ? body
+      : body && typeof body === "object" && Object.keys(body).length > 0
+      ? JSON.stringify(body)
+      : undefined;
 
   try {
     const response = await fetch(fullUrl, {
       method,
-      body: requestBody, // Sử dụng requestBody đã xử lý
+      body: requestBody, // Gửi FormData trực tiếp nếu có
       ...option,
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new HttpError(error.message || "Lỗi server", error.statusCode); // Throw the specific message
+      throw new HttpError(error.message || "Lỗi server", error.statusCode);
     }
     const payload: Request = await response.json();
     return payload;
   } catch (error) {
     if (error instanceof HttpError) {
-      throw error; // Re-throw the error with the message intact
+      throw error;
     } else {
       throw new Error("Lỗi server!!!");
     }
@@ -59,11 +62,11 @@ const res = async <Request>({
 const https = {
   get: <Request>(url: string, options: Option) =>
     res<Request>({ method: "GET", url, option: options }),
-  post: <Request>(url: string, options: Option, body: unknown) =>
+  post: <Request>(url: string, options: Option, body?: unknown) =>
     res<Request>({ method: "POST", body, url, option: options }),
-  put: <Request>(url: string, options: Option, body: unknown) =>
+  put: <Request>(url: string, options: Option, body?: unknown) =>
     res<Request>({ method: "PUT", body, url, option: options }),
-  patch: <Request>(url: string, options: Option, body: unknown) =>
+  patch: <Request>(url: string, options: Option, body?: unknown) =>
     res<Request>({ method: "PATCH", body, url, option: options }),
   delete: <Request>(url: string, options: Option) =>
     res<Request>({ method: "DELETE", url, option: options }),

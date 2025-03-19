@@ -3,15 +3,15 @@ import { OrderItemsService } from "./order-items.service";
 import { OrderItemsController } from "./order-items.controller";
 import { MongooseModule } from "@nestjs/mongoose";
 import { OrderItem, OrderItemSchema } from "./entities/order-item.entity";
-import { ProductsModule } from "src/mobiles/products.module";
 import { OrderModule } from "src/order/order.module";
+import { MobilesModule } from "src/mobiles/mobiles.module";
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: OrderItem.name, schema: OrderItemSchema },
     ]),
-    ProductsModule,
+    MobilesModule,
     forwardRef(() => OrderModule),
   ],
   controllers: [OrderItemsController],

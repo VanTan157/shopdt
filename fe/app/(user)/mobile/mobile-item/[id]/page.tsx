@@ -1,15 +1,15 @@
-import { ProductType } from "@/app/validate";
 import https from "@/lib/http";
 import Image from "next/image";
 import BtnBuyNow from "../../btn-buy-now";
 import BtnAddCart from "../../btn-add-cart";
+import { MobileType } from "@/app/validate";
 
 const Page = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
-  let product: ProductType | null = null;
+  let product: MobileType | null = null;
 
   try {
-    const res = await https.get<ProductType>(`products/${id}`, {
+    const res = await https.get<MobileType>(`mobiles/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },

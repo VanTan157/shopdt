@@ -8,7 +8,7 @@ import {
   IsOptional,
 } from "class-validator";
 
-export class CreateProductDto {
+export class CreateMobileDto {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -32,5 +32,5 @@ export class CreateProductDto {
 
   @IsMongoId()
   @IsNotEmpty()
-  product_type_id: string;
+  mobile_type_id: string;
 }

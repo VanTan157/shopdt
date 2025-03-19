@@ -1,7 +1,7 @@
 import https from "@/lib/http";
 import { cookies } from "next/headers";
-import { OrderType } from "../validate";
 import OrderList from "./order-list";
+import { OrderType } from "@/app/validate";
 
 const Page = async () => {
   const cookieStore = await cookies();

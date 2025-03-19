@@ -58,17 +58,17 @@ export class OrderService {
   //   phone_number: string,
   //   address: string
   // ): Promise<Order> {
-  //   const product = await this.productsService.findOne(product_id);
-  //   if (!product) {
-  //     throw new NotFoundException(`Product not found: ${product_id}`);
+  //   const mobile = await this.productsService.findOne(product_id);
+  //   if (!mobile) {
+  //     throw new NotFoundException(`mobile not found: ${product_id}`);
   //   }
 
-  //   const total_price = product.price * quantity;
+  //   const total_price = mobile.price * quantity;
   //   const tempOrderItem = new this.orderItemModel({
   //     user_id: userId,
   //     product_id,
   //     quantity,
-  //     unit_price: product.price,
+  //     unit_price: mobile.price,
   //     total_price,
   //   });
 
@@ -162,8 +162,8 @@ export class OrderService {
         path: "orderitem_ids",
         model: "OrderItem", // Populate OrderItem
         populate: {
-          path: "product_id", // Populate product_id trong OrderItem
-          model: "Product", // Rõ ràng chỉ định model Product
+          path: "mobile_id",
+          model: "Mobile",
         },
       })
       .exec();
@@ -195,8 +195,8 @@ export class OrderService {
         path: "orderitem_ids",
         model: "OrderItem", // Populate OrderItem
         populate: {
-          path: "product_id", // Populate product_id trong OrderItem
-          model: "Product", // Rõ ràng chỉ định model Product
+          path: "mobile_id",
+          model: "Mobile",
         },
       }) // Optional: populate order items if needed
       .exec();
