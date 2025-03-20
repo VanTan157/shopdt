@@ -13,15 +13,19 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useRef } from "react";
-import { CartCreateType, MobileType } from "../../validate";
+import { CartCreateType } from "../../validate";
 import https, { HttpError } from "@/lib/http";
 import { toast } from "sonner";
 import { useCartStore } from "@/lib/cartStore";
-interface Product {
-  product: MobileType;
-}
+import { ColorVariantType, MobileType } from "@/lib/validate/mobile";
 
-const BtnAddCart = ({ product }: Product) => {
+const BtnAddCart = ({
+  product,
+  colorVariants,
+}: {
+  product: MobileType;
+  colorVariants: ColorVariantType;
+}) => {
   const [quantity, setQuantity] = useState(1);
   const cartIconRef = useRef<HTMLDivElement | null>(null);
   const { incrementCartCount } = useCartStore();
@@ -36,11 +40,20 @@ const BtnAddCart = ({ product }: Product) => {
           },
           credentials: "include",
         },
-        { mobile_id: product._id, quantity }
+        {
+          mobile_id: product._id,
+          quantity,
+          colorVariant: {
+            _id: colorVariants._id,
+            color: colorVariants.color,
+            image: colorVariants.image,
+          },
+        }
       );
       console.log(res);
       incrementCartCount(1);
       toast.success("Thêm vào giỏ hàng thành công");
+      setQuantity(1);
 
       // Tạo hiệu ứng chuyển động
       const cartIcon = cartIconRef.current;
@@ -80,12 +93,6 @@ const BtnAddCart = ({ product }: Product) => {
     }
   };
 
-  // const handleConfirmPurchase = () => {
-  //   console.log({ product, quantity });
-  //   setQuantity(1);
-  //   handleBuyNow();
-  // };
-
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -93,7 +100,7 @@ const BtnAddCart = ({ product }: Product) => {
           Thêm vào giỏ hàng
           <div ref={cartIconRef} className="inline-block ml-2">
             <Image
-              src={`http://localhost:8080${product.image}`}
+              src={`http://localhost:8080${colorVariants.image}`}
               alt={product.name}
               width={24}
               height={24}
@@ -109,7 +116,7 @@ const BtnAddCart = ({ product }: Product) => {
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
             <Image
-              src={`http://localhost:8080${product.image}`}
+              src={`http://localhost:8080${colorVariants.image}`}
               alt={product.name}
               width={64}
               height={64}

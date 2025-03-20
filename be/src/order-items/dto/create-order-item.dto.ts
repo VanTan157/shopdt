@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsNotEmpty, IsString, IsNumber, Min } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, Min, IsObject } from "class-validator";
 
 export class CreateOrderItemDto {
   @IsNotEmpty()
@@ -11,4 +11,7 @@ export class CreateOrderItemDto {
   @IsNumber({}, { message: "quantity must be a number" })
   @Min(1, { message: "quantity must be at least 1" })
   quantity: number;
+
+  @IsObject()
+  colorVariant: { _id: string; color: string; image: string };
 }

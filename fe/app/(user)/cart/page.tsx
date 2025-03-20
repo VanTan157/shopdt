@@ -1,16 +1,16 @@
 // pages/cart.tsx (hoặc đường dẫn tương ứng)
 import https from "@/lib/http";
 import { cookies } from "next/headers";
-import { CartType } from "../../validate";
 import CartClient from "./cart-client";
+import { OrderItemType } from "@/lib/validate/order";
 // Import Client Component
 
 const Page = async () => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
-  let carts: CartType[] = [];
+  let carts: OrderItemType[] = [];
   try {
-    const res = await https.get<CartType[]>(
+    const res = await https.get<OrderItemType[]>(
       `order-items/get-order-not-in-cart`,
       {
         headers: {

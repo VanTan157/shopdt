@@ -24,10 +24,13 @@ const CameraSchema = z.object({
 });
 
 // Schema cho ColorVariant
-const ColorVariantSchema = z.object({
+export const ColorVariantSchema = z.object({
+  _id: z.string(),
   color: z.string(),
   image: z.string(),
 });
+
+export type ColorVariantType = z.infer<typeof ColorVariantSchema>;
 
 // Schema chính cho Mobile
 export const Mobile = z.object({

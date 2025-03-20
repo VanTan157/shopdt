@@ -13,15 +13,18 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState } from "react";
-import { CartCreateType, MobileType } from "../../validate";
+import { CartCreateType } from "../../validate";
 import https, { HttpError } from "@/lib/http";
 import { toast } from "sonner";
+import { ColorVariantType, MobileType } from "@/lib/validate/mobile";
 
-interface Product {
+const BtnBuyNow = ({
+  product,
+  colorVariants,
+}: {
   product: MobileType;
-}
-
-const BtnBuyNow = ({ product }: Product) => {
+  colorVariants: ColorVariantType;
+}) => {
   const [quantity, setQuantity] = useState(1);
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
@@ -89,7 +92,7 @@ const BtnBuyNow = ({ product }: Product) => {
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
             <Image
-              src={`http://localhost:8080${product.image}`}
+              src={`http://localhost:8080${colorVariants.image}`}
               alt={product.name}
               width={64}
               height={64}
@@ -97,9 +100,8 @@ const BtnBuyNow = ({ product }: Product) => {
             />
             <div>
               <p className="text-lg font-semibold">{product.name}</p>
-              <p className="text-gray-600">
-                Giá: {product.finalPrice.toLocaleString()} VND
-              </p>
+              <p className="text-gray-600">{colorVariants.color}</p>
+              <p className="">Giá: {product.finalPrice.toLocaleString()} VND</p>
             </div>
           </div>
           <div>

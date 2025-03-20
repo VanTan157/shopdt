@@ -3,6 +3,8 @@
 import { MobileType } from "@/lib/validate/mobile";
 import Image from "next/image";
 import { useState } from "react";
+import BtnAddCart from "../../btn-add-cart";
+import BtnBuyNow from "../../btn-buy-now";
 
 const MobileItem = ({ product }: { product: MobileType }) => {
   const [count, setCount] = useState(0);
@@ -87,10 +89,16 @@ const MobileItem = ({ product }: { product: MobileType }) => {
           </div>
 
           {/* Nút hành động (bỏ comment nếu cần) */}
-          {/* <div className="flex space-x-4">
-            <BtnBuyNow product={product} />
-            <BtnAddCart product={product} />
-          </div> */}
+          <div className="flex space-x-4">
+            <BtnBuyNow
+              product={product}
+              colorVariants={product.colorVariants[count]}
+            />
+            <BtnAddCart
+              product={product}
+              colorVariants={product.colorVariants[count]}
+            />
+          </div>
         </div>
       </div>
 

@@ -36,7 +36,7 @@ export class OrderItemsService {
   }
 
   async create(createOrderItemDto: CreateOrderItemDto, userId) {
-    const { mobile_id, quantity } = createOrderItemDto;
+    const { mobile_id, quantity, colorVariant } = createOrderItemDto;
     if (!Types.ObjectId.isValid(mobile_id)) {
       throw new NotFoundException("Id sản phẩm không hợp lệ");
     }
@@ -54,6 +54,11 @@ export class OrderItemsService {
       quantity,
       unit_price: mobile.finalPrice,
       total_price,
+      colorVariant: {
+        _id: colorVariant._id,
+        color: colorVariant.color,
+        image: colorVariant.image,
+      },
     });
 
     return orderItem.save();

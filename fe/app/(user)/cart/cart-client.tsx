@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { CartType } from "../../validate";
 import https from "@/lib/http";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -14,12 +13,9 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { OrderItemType } from "@/lib/validate/order";
 
-type CartClientProps = {
-  initialCarts: CartType[];
-};
-
-const CartClient = ({ initialCarts }: CartClientProps) => {
+const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
   console.log(initialCarts);
   const router = useRouter();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -113,7 +109,7 @@ const CartClient = ({ initialCarts }: CartClientProps) => {
               >
                 <div className="relative w-32 h-32 flex-shrink-0">
                   <Image
-                    src={`http://localhost:8080${item.mobile_id.image}`}
+                    src={`http://localhost:8080${item.colorVariant.image}`}
                     alt={item.mobile_id.name}
                     fill
                     sizes="100px"
@@ -125,6 +121,7 @@ const CartClient = ({ initialCarts }: CartClientProps) => {
                   <h2 className="text-xl font-semibold">
                     {item.mobile_id.name}
                   </h2>
+                  <p className="text-gray-700">{item.colorVariant.color}</p>
                   <p className="text-gray-700">
                     Unit Price: {item.unit_price.toLocaleString()} VNĐ
                   </p>
