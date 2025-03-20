@@ -6,6 +6,7 @@ const MobilePage = async () => {
   try {
     const res = await ReqApi.getAllMobile();
     products = res;
+    console.log(products);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);

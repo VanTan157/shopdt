@@ -5,10 +5,10 @@ import { MobileTypesService } from "src/mobile-types/mobile-types.service";
 import { Mobile } from "./entities/mobiles.entity";
 import { CreateMobileDto } from "./dto/create-mobiles.dto";
 import { UpdateMobileDto } from "./dto/update-mobiles.dto";
-import * as fs from "fs"; // Import fs module
-import { promisify } from "util"; // Import promisify để dùng async/await với fs
+import * as fs from "fs";
+import { promisify } from "util";
 
-const unlinkAsync = promisify(fs.unlink); // Chuyển fs.unlink thành Promise
+const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class MobilesService {
@@ -19,32 +19,54 @@ export class MobilesService {
 
   async create(
     createMobileDto: CreateMobileDto,
-    file?: Express.Multer.File
+    files: Express.Multer.File[]
   ): Promise<Mobile> {
     const mobileType = await this.mobileTypesService.findOne(
       createMobileDto.mobile_type_id
     );
-    if (!mobileType) {
-      throw new NotFoundException("Mobile type không tồn tại");
-    }
+    if (!mobileType) throw new NotFoundException("Mobile type không tồn tại");
 
     const promotion = createMobileDto.promotion ?? 0;
     const IsPromotion = promotion > 0;
-
     const finalPrice =
       createMobileDto.StartingPrice -
       (promotion * createMobileDto.StartingPrice) / 100;
+
+    const colorVariants = createMobileDto.colorVariants.map(
+      (variant, index) => {
+        if (!files[index])
+          throw new NotFoundException(`Thiếu ảnh cho màu ${variant.color}`);
+        return {
+          color: variant.color,
+          image: `/image/${files[index].filename}`,
+        };
+      }
+    );
 
     const mobileData = {
       ...createMobileDto,
       finalPrice,
       promotion,
       IsPromotion,
-      image: file ? `/image/${file.filename}` : undefined,
+      colorVariants,
+      stock: createMobileDto.stock ?? 0,
+      isAvailable:
+        createMobileDto.stock !== undefined ? createMobileDto.stock > 0 : true,
     };
 
     const newMobile = new this.mobileModel(mobileData);
-    return newMobile.save();
+    try {
+      return await newMobile.save();
+    } catch (error) {
+      await Promise.all(
+        colorVariants.map((variant) =>
+          unlinkAsync(`.${variant.image}`).catch((err) =>
+            console.error("Không thể xóa file:", err)
+          )
+        )
+      );
+      throw error;
+    }
   }
 
   async findAll(): Promise<Mobile[]> {
@@ -52,67 +74,69 @@ export class MobilesService {
   }
 
   async findOne(id: string): Promise<Mobile> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new Error("ID không hợp lệ");
-    }
+    if (!Types.ObjectId.isValid(id)) throw new Error("ID không hợp lệ");
     const mobile = await this.mobileModel
       .findById(id)
       .populate("mobile_type_id")
       .exec();
-    if (!mobile) {
-      throw new NotFoundException("Mobile không tồn tại");
-    }
+    if (!mobile) throw new NotFoundException("Mobile không tồn tại");
     return mobile;
   }
 
   async update(
     id: string,
     updateMobileDto: UpdateMobileDto,
-    file?: Express.Multer.File
+    files?: Express.Multer.File[]
   ) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new Error("ID không hợp lệ");
-    }
+    if (!Types.ObjectId.isValid(id)) throw new Error("ID không hợp lệ");
 
-    const mobile = await this.mobileModel.findById({ _id: id }).exec();
-    if (!mobile) {
-      throw new NotFoundException("Không tìm thấy Mobile");
-    }
+    const mobile = await this.mobileModel.findById(id).exec();
+    if (!mobile) throw new NotFoundException("Không tìm thấy Mobile");
 
-    const startingPrice =
-      updateMobileDto.StartingPrice !== undefined
-        ? updateMobileDto.StartingPrice
-        : mobile.StartingPrice;
-    const promotion =
-      updateMobileDto.promotion !== undefined
-        ? updateMobileDto.promotion
-        : mobile.promotion;
-
-    const isPromotion = promotion > 0;
+    const startingPrice = updateMobileDto.StartingPrice ?? mobile.StartingPrice;
+    const promotion = updateMobileDto.promotion ?? mobile.promotion;
     const finalPrice = startingPrice - (promotion * startingPrice) / 100;
 
-    // Xử lý ảnh: Nếu có file mới và sản phẩm đã có ảnh cũ, xóa ảnh cũ
-    let image = mobile.image; // Giữ ảnh cũ mặc định
-    if (file) {
-      if (mobile.image) {
-        const oldImagePath = `.${mobile.image}`; // Đường dẫn đầy đủ tới ảnh cũ (thêm dấu . vì đường dẫn bắt đầu bằng /image/)
-        await unlinkAsync(oldImagePath).catch((err) =>
-          console.error("Không thể xóa ảnh cũ:", err)
-        );
-      }
-      image = `/image/${file.filename}`; // Cập nhật đường dẫn ảnh mới
+    let colorVariants = mobile.colorVariants;
+    if (updateMobileDto.colorVariants && files) {
+      const oldImagesToDelete = mobile.colorVariants.filter((oldVariant) =>
+        updateMobileDto?.colorVariants?.some(
+          (newVariant, idx) =>
+            newVariant.color === oldVariant.color && files[idx]
+        )
+      );
+      await Promise.all(
+        oldImagesToDelete.map((variant) =>
+          unlinkAsync(`.${variant.image}`).catch((err) =>
+            console.error("Không thể xóa ảnh cũ:", err)
+          )
+        )
+      );
+
+      colorVariants = updateMobileDto.colorVariants.map((variant, index) => ({
+        color: variant.color,
+        image: files[index]
+          ? `/image/${files[index].filename}`
+          : mobile.colorVariants.find((v) => v.color === variant.color)
+              ?.image || "",
+      }));
     }
 
     const updatedMobile = await this.mobileModel
       .findByIdAndUpdate(
-        { _id: id },
+        id,
         {
           ...updateMobileDto,
           finalPrice,
-          IsPromotion: isPromotion,
+          IsPromotion: promotion > 0,
           StartingPrice: startingPrice,
           promotion,
-          image, // Cập nhật ảnh
+          colorVariants,
+          stock: updateMobileDto.stock ?? mobile.stock,
+          isAvailable:
+            updateMobileDto.stock !== undefined
+              ? updateMobileDto.stock > 0
+              : mobile.isAvailable,
         },
         { new: true }
       )
@@ -122,45 +146,30 @@ export class MobilesService {
   }
 
   async remove(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new Error("ID không hợp lệ");
-    }
+    if (!Types.ObjectId.isValid(id)) throw new Error("ID không hợp lệ");
 
-    const mobile = await this.mobileModel.findById({ _id: id }).exec();
-    if (!mobile) {
-      throw new Error("Không tìm thấy Mobile");
-    }
+    const mobile = await this.mobileModel.findById(id).exec();
+    if (!mobile) throw new NotFoundException("Không tìm thấy Mobile");
 
-    // Xóa ảnh nếu sản phẩm có ảnh
-    if (mobile.image) {
-      const imagePath = `.${mobile.image}`; // Đường dẫn đầy đủ tới ảnh
-      await unlinkAsync(imagePath).catch((err) =>
-        console.error("Không thể xóa ảnh:", err)
-      );
-    }
+    await Promise.all(
+      mobile.colorVariants.map((variant) =>
+        unlinkAsync(`.${variant.image}`).catch((err) =>
+          console.error("Không thể xóa ảnh:", err)
+        )
+      )
+    );
 
-    // Xóa sản phẩm khỏi database
-    const deletedMobile = await this.mobileModel
-      .findByIdAndDelete({ _id: id })
-      .exec();
-    return deletedMobile;
+    return this.mobileModel.findByIdAndDelete(id).exec();
   }
 
   async findByMobileType(mobileTypeId: string): Promise<Mobile[]> {
-    if (!Types.ObjectId.isValid(mobileTypeId)) {
+    if (!Types.ObjectId.isValid(mobileTypeId))
       throw new NotFoundException("Mobile type ID không hợp lệ");
-    }
-
     const mobileType = await this.mobileTypesService.findOne(mobileTypeId);
-    if (!mobileType) {
-      throw new NotFoundException("Mobile type không tồn tại");
-    }
-
-    const mobiles = await this.mobileModel
+    if (!mobileType) throw new NotFoundException("Mobile type không tồn tại");
+    return this.mobileModel
       .find({ mobile_type_id: mobileTypeId })
       .populate("mobile_type_id")
       .exec();
-
-    return mobiles;
   }
 }

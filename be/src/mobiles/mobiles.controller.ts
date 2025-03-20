@@ -8,24 +8,18 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
-  InternalServerErrorException,
+  UploadedFiles,
 } from "@nestjs/common";
 import { AuthGuard } from "src/auth/auth.guard";
 import { RolesGuard } from "src/auth/roles.guard";
 import { Roles } from "src/auth/roles.decorator";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
-import * as fs from "fs"; // Import fs để xóa file
-import { promisify } from "util";
-
 import { CreateMobileDto } from "./dto/create-mobiles.dto";
 import { UpdateMobileDto } from "./dto/update-mobiles.dto";
 import { Mobile } from "./entities/mobiles.entity";
 import { MobilesService } from "./mobiles.service";
-
-const unlinkAsync = promisify(fs.unlink); // Chuyển fs.unlink thành Promise
 
 @Controller("mobiles")
 export class MobilesController {
@@ -35,7 +29,7 @@ export class MobilesController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("ADMIN")
   @UseInterceptors(
-    FileInterceptor("image", {
+    FilesInterceptor("images", 10, {
       storage: diskStorage({
         destination: "./image",
         filename: (req, file, cb) => {
@@ -49,31 +43,16 @@ export class MobilesController {
         const allowedTypes = /jpeg|jpg|png|gif/;
         const ext = allowedTypes.test(extname(file.originalname).toLowerCase());
         const mime = allowedTypes.test(file.mimetype);
-        if (ext && mime) {
-          cb(null, true);
-        } else {
-          cb(new Error("Chỉ chấp nhận file ảnh (jpg, png, gif)"), false);
-        }
+        if (ext && mime) cb(null, true);
+        else cb(new Error("Chỉ chấp nhận file ảnh (jpg, png, gif)"), false);
       },
     })
   )
   async create(
     @Body() createMobileDto: CreateMobileDto,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFiles() files: Express.Multer.File[]
   ) {
-    try {
-      const mobile = await this.mobilesService.create(createMobileDto, file);
-      return mobile;
-    } catch (error) {
-      // Nếu tạo không thành công và có file, xóa file đã upload
-      if (file) {
-        const filePath = `./image/${file.filename}`;
-        await unlinkAsync(filePath).catch((err) =>
-          console.error("Không thể xóa file ảnh:", err)
-        );
-      }
-      throw error; // Ném lại lỗi để client nhận được
-    }
+    return this.mobilesService.create(createMobileDto, files);
   }
 
   @Get()
@@ -90,7 +69,7 @@ export class MobilesController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("ADMIN")
   @UseInterceptors(
-    FileInterceptor("image", {
+    FilesInterceptor("images", 10, {
       storage: diskStorage({
         destination: "./image",
         filename: (req, file, cb) => {
@@ -104,20 +83,17 @@ export class MobilesController {
         const allowedTypes = /jpeg|jpg|png|gif/;
         const ext = allowedTypes.test(extname(file.originalname).toLowerCase());
         const mime = allowedTypes.test(file.mimetype);
-        if (ext && mime) {
-          cb(null, true);
-        } else {
-          cb(new Error("Chỉ chấp nhận file ảnh (jpg, png, gif)"), false);
-        }
+        if (ext && mime) cb(null, true);
+        else cb(new Error("Chỉ chấp nhận file ảnh (jpg, png, gif)"), false);
       },
     })
   )
   update(
     @Param("id") id: string,
     @Body() updateMobileDto: UpdateMobileDto,
-    @UploadedFile() file?: Express.Multer.File
+    @UploadedFiles() files?: Express.Multer.File[]
   ) {
-    return this.mobilesService.update(id, updateMobileDto, file);
+    return this.mobilesService.update(id, updateMobileDto, files);
   }
 
   @Delete(":id")

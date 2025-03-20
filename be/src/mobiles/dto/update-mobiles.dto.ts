@@ -1,36 +1,67 @@
-import { Transform } from "class-transformer";
 import {
-  IsBoolean,
-  IsMongoId,
-  IsNumber,
-  IsOptional,
   IsString,
+  IsNumber,
+  IsMongoId,
+  IsArray,
+  IsObject,
+  IsOptional,
 } from "class-validator";
 
 export class UpdateMobileDto {
   @IsString()
   @IsOptional()
-  name: string;
+  name?: string;
 
-  @IsOptional()
-  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
-  StartingPrice: number;
+  @IsOptional()
+  StartingPrice?: number;
 
-  @IsOptional()
-  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
-  promotion: number;
+  @IsOptional()
+  promotion?: number;
 
   @IsString()
   @IsOptional()
-  description: string;
-
-  @IsString()
-  @IsOptional()
-  image: string;
+  description?: string;
 
   @IsMongoId()
   @IsOptional()
-  mobile_type_id: string; // Thay product_type_id thành mobile_type_id
+  mobile_type_id?: string;
+
+  @IsObject()
+  @IsOptional()
+  specifications?: {
+    screenSize?: number;
+    resolution?: string;
+    cpu?: string;
+    ram?: number;
+    storage?: number;
+    battery?: number;
+    os?: string;
+  };
+
+  @IsArray()
+  @IsObject({ each: true })
+  @IsOptional()
+  colorVariants?: { color: string; image?: string }[];
+
+  @IsNumber()
+  @IsOptional()
+  stock?: number;
+
+  @IsObject()
+  @IsOptional()
+  camera?: {
+    rear?: string;
+    front?: string;
+  };
+
+  @IsNumber()
+  @IsOptional()
+  weight?: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
 }

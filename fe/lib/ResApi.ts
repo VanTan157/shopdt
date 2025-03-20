@@ -3,11 +3,11 @@ import {
   LoginResType,
   LoginType,
   MobileTType,
-  MobileType,
   RegisterResType,
   RegisterType,
 } from "@/app/validate";
 import https from "./http";
+import { MobileType } from "./validate/mobile";
 
 const ReqApi = {
   login: async (values: LoginType) =>

@@ -1,8 +1,6 @@
 import https from "@/lib/http";
-import Image from "next/image";
-import BtnBuyNow from "../../btn-buy-now";
-import BtnAddCart from "../../btn-add-cart";
-import { MobileType } from "@/app/validate";
+import { MobileType } from "@/lib/validate/mobile";
+import MobileItem from "./mobile-item";
 
 const Page = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
@@ -27,57 +25,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
     );
   }
 
-  if (!product) {
-    return <div className="text-center py-8">Đang tải...</div>;
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <div className="relative flex justify-center">
-          <Image
-            src={`http://localhost:8080${product.image}`}
-            alt={product.name}
-            width={300}
-            height={300}
-            className="object-contain rounded-lg shadow-md max-h-[400px] w-full"
-            priority
-            unoptimized
-            quality={100}
-          />
-          {product.IsPromotion && (
-            <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
-              -{Math.round(product.promotion)}%
-            </div>
-          )}
-        </div>
-
-        {/* Phần thông tin sản phẩm */}
-        <div className="space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
-            {product.name}
-          </h1>
-          <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-            {product.description}
-          </p>
-          <div className="flex items-center space-x-4">
-            <p className="text-2xl md:text-3xl font-semibold text-red-600">
-              {product.finalPrice.toLocaleString()} VND
-            </p>
-            {product.IsPromotion && (
-              <p className="text-lg text-gray-500 line-through">
-                {(product.StartingPrice || 0).toLocaleString()} VND
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-            <BtnBuyNow product={product} />
-            <BtnAddCart product={product} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <MobileItem product={product} />;
 };
 
 export default Page;

@@ -1,36 +1,84 @@
-import { Transform } from "class-transformer";
 import {
   IsString,
   IsNumber,
-  IsNotEmpty,
   IsMongoId,
-  IsBoolean,
+  IsArray,
+  IsObject,
   IsOptional,
 } from "class-validator";
+import { Transform } from "class-transformer";
 
 export class CreateMobileDto {
   @IsString()
-  @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
-  @Transform(({ value }) => parseFloat(value)) // Chuyển chuỗi thành số
   @IsNumber()
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
   StartingPrice: number;
 
-  @IsOptional()
-  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
-  promotion: number;
-
-  @IsBoolean()
   @IsOptional()
-  IsPromotion?: boolean;
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
+  promotion?: number;
 
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @IsMongoId()
-  @IsNotEmpty()
   mobile_type_id: string;
+
+  @IsObject()
+  @IsOptional()
+  @Transform(
+    ({ value }) => (typeof value === "string" ? JSON.parse(value) : value),
+    { toClassOnly: true }
+  )
+  specifications?: {
+    screenSize?: number;
+    resolution?: string;
+    cpu?: string;
+    ram?: number;
+    storage?: number;
+    battery?: number;
+    os?: string;
+  };
+
+  @IsArray()
+  @IsObject({ each: true })
+  @Transform(
+    ({ value }) => (typeof value === "string" ? JSON.parse(value) : value),
+    { toClassOnly: true }
+  )
+  colorVariants: { color: string; image?: string }[];
+
+  @IsNumber()
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
+  stock?: number;
+
+  @IsObject()
+  @IsOptional()
+  @Transform(
+    ({ value }) => (typeof value === "string" ? JSON.parse(value) : value),
+    { toClassOnly: true }
+  )
+  camera?: {
+    rear?: string;
+    front?: string;
+  };
+
+  @IsNumber()
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
+  weight?: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  @Transform(
+    ({ value }) => (typeof value === "string" ? JSON.parse(value) : value),
+    { toClassOnly: true }
+  )
+  tags?: string[];
 }
