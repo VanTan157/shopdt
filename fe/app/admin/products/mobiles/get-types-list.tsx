@@ -1,11 +1,13 @@
 import ReqApi from "@/lib/ResApi";
 import Link from "next/link";
+import BtnAddMobile from "./btn-add-mobile";
+import BtnAddType from "./btn-add-type";
+import BtnDeleteType from "./btn-delete-type";
 
 const ProductTypesList = async () => {
   let product_types = null;
   try {
     product_types = await ReqApi.getAllMobileType();
-    console.log(product_types);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
@@ -23,6 +25,11 @@ const ProductTypesList = async () => {
             </Link>
           </div>
         ))}
+      </div>
+      <div className="pt-4 flex space-x-4">
+        <BtnAddMobile type={product_types || []} />
+        <BtnAddType />
+        <BtnDeleteType types={product_types || []} />
       </div>
     </div>
   );

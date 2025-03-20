@@ -5,6 +5,10 @@ import { MobileTypesService } from "src/mobile-types/mobile-types.service";
 import { Mobile } from "./entities/mobiles.entity";
 import { CreateMobileDto } from "./dto/create-mobiles.dto";
 import { UpdateMobileDto } from "./dto/update-mobiles.dto";
+import * as fs from "fs"; // Import fs module
+import { promisify } from "util"; // Import promisify để dùng async/await với fs
+
+const unlinkAsync = promisify(fs.unlink); // Chuyển fs.unlink thành Promise
 
 @Injectable()
 export class MobilesService {
@@ -61,7 +65,11 @@ export class MobilesService {
     return mobile;
   }
 
-  async update(id: string, updateMobileDto: UpdateMobileDto) {
+  async update(
+    id: string,
+    updateMobileDto: UpdateMobileDto,
+    file?: Express.Multer.File
+  ) {
     if (!Types.ObjectId.isValid(id)) {
       throw new Error("ID không hợp lệ");
     }
@@ -81,8 +89,19 @@ export class MobilesService {
         : mobile.promotion;
 
     const isPromotion = promotion > 0;
-
     const finalPrice = startingPrice - (promotion * startingPrice) / 100;
+
+    // Xử lý ảnh: Nếu có file mới và sản phẩm đã có ảnh cũ, xóa ảnh cũ
+    let image = mobile.image; // Giữ ảnh cũ mặc định
+    if (file) {
+      if (mobile.image) {
+        const oldImagePath = `.${mobile.image}`; // Đường dẫn đầy đủ tới ảnh cũ (thêm dấu . vì đường dẫn bắt đầu bằng /image/)
+        await unlinkAsync(oldImagePath).catch((err) =>
+          console.error("Không thể xóa ảnh cũ:", err)
+        );
+      }
+      image = `/image/${file.filename}`; // Cập nhật đường dẫn ảnh mới
+    }
 
     const updatedMobile = await this.mobileModel
       .findByIdAndUpdate(
@@ -93,6 +112,7 @@ export class MobilesService {
           IsPromotion: isPromotion,
           StartingPrice: startingPrice,
           promotion,
+          image, // Cập nhật ảnh
         },
         { new: true }
       )
@@ -101,15 +121,29 @@ export class MobilesService {
     return updatedMobile;
   }
 
-  async remove(id: string): Promise<Mobile> {
+  async remove(id: string) {
     if (!Types.ObjectId.isValid(id)) {
       throw new Error("ID không hợp lệ");
     }
-    const mobile = await this.mobileModel.findByIdAndDelete({ _id: id }).exec();
+
+    const mobile = await this.mobileModel.findById({ _id: id }).exec();
     if (!mobile) {
       throw new Error("Không tìm thấy Mobile");
     }
-    return mobile;
+
+    // Xóa ảnh nếu sản phẩm có ảnh
+    if (mobile.image) {
+      const imagePath = `.${mobile.image}`; // Đường dẫn đầy đủ tới ảnh
+      await unlinkAsync(imagePath).catch((err) =>
+        console.error("Không thể xóa ảnh:", err)
+      );
+    }
+
+    // Xóa sản phẩm khỏi database
+    const deletedMobile = await this.mobileModel
+      .findByIdAndDelete({ _id: id })
+      .exec();
+    return deletedMobile;
   }
 
   async findByMobileType(mobileTypeId: string): Promise<Mobile[]> {

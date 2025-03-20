@@ -42,38 +42,33 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               className="flex flex-col flex-grow"
             >
               {/* Image Container */}
-              <div className="relative w-full h-40 sm:h-48 md:h-56 overflow-hidden">
+              <div className="relative w-42 h-42 overflow-hidden">
                 <Image
                   src={`http://localhost:8080${product.image}`}
                   alt={product.name}
                   fill
-                  className="object-cover rounded-t-xl group-hover:scale-105 transition-transform duration-300"
-                  quality={85}
+                  priority
+                  unoptimized
+                  quality={100}
+                  className="object-cover rounded-md"
                 />
                 {product.IsPromotion && (
                   <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
-                    -{Math.round(product.promotion * 100)}%
+                    -{Math.round(product.promotion)}%
                   </span>
                 )}
               </div>
 
               {/* Product Info */}
               <div className="p-4 flex flex-col flex-grow text-center">
-                <h2 className="text-base sm:text-lg  font-semibold text-gray-800 mb-2 line-clamp-1 group-hover:text-red-600 transition-colors duration-300">
+                <p className=" font-semibold text-gray-800 mb-2 line-clamp-1 group-hover: transition-colors duration-300">
                   {product.name}
-                </h2>
-                <p className="text-red-600 font-bold text-base sm:text-lg">
+                </p>
+                <p className="text-red-600 ">
                   {product.finalPrice.toLocaleString()} VND
                 </p>
               </div>
             </Link>
-
-            {/* Buy Button */}
-            <div className="px-4 pb-4">
-              <button className="w-full bg-red-600 text-white py-2 rounded-lg font-medium hover:bg-red-700 transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm">
-                Mua ngay
-              </button>
-            </div>
           </div>
         ))}
       </div>

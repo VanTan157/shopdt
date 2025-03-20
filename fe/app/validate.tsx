@@ -42,7 +42,7 @@ export const Mobile = z.object({
   IsPromotion: z.boolean(),
   description: z.string(),
   image: z.string(),
-  mobile_type: z.object({
+  mobile_type_id: z.object({
     _id: z.string(),
     type: z.string(),
   }),

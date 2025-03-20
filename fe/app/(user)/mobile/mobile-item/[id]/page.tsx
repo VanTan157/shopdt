@@ -34,19 +34,20 @@ const Page = async ({ params }: { params: { id: string } }) => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Phần hình ảnh */}
         <div className="relative flex justify-center">
           <Image
             src={`http://localhost:8080${product.image}`}
             alt={product.name}
-            width={400}
-            height={400}
+            width={300}
+            height={300}
             className="object-contain rounded-lg shadow-md max-h-[400px] w-full"
+            priority
+            unoptimized
             quality={100}
           />
           {product.IsPromotion && (
             <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
-              -{Math.round(product.promotion * 100)}%
+              -{Math.round(product.promotion)}%
             </div>
           )}
         </div>

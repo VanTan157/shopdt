@@ -1,7 +1,6 @@
 "use client";
 
-import { MobileType } from "@/app/validate";
-import { Button } from "@/components/ui/button";
+import { MobileTType, MobileType } from "@/app/validate";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -12,8 +11,16 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { useState } from "react";
+import BtnDeleteMobile from "./btn-delete-mobile";
+import BtnEditMobile from "./btn-edit-mobile";
 
-const MobileTable = ({ mobiles }: { mobiles: MobileType[] }) => {
+const MobileTable = ({
+  mobiles,
+  type,
+}: {
+  mobiles: MobileType[];
+  type?: MobileTType[];
+}) => {
   const [promotionFilter, setPromotionFilter] = useState<string>("all"); // Bộ lọc mặc định là "Tất cả"
   const [searchName, setSearchName] = useState<string>("");
 
@@ -42,7 +49,7 @@ const MobileTable = ({ mobiles }: { mobiles: MobileType[] }) => {
   };
 
   return (
-    <div className="overflow-x-auto pr-4 pt-4">
+    <div className="overflow-x-auto pr-4 pt-2">
       <div className="mb-4 flex items-center space-x-4">
         {/* Bộ lọc Khuyến mãi */}
         <div className="flex items-center space-x-2">
@@ -140,9 +147,9 @@ const MobileTable = ({ mobiles }: { mobiles: MobileType[] }) => {
                   <span className="text-red-500">Không</span>
                 )}
               </td>
-              <td className="border border-gray-200 px-4 py-2">
-                <Button>Sửa</Button>
-                <Button>Xóa</Button>
+              <td className="border border-gray-200 px-4 py-2 space-x-2">
+                <BtnEditMobile mobile={mobile} type={type || []} />
+                <BtnDeleteMobile id={mobile._id} />
               </td>
             </tr>
           ))}
