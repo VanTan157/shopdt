@@ -93,7 +93,11 @@ export class OrderService {
   // }
 
   async findAll() {
-    return this.orderModel.find().populate("orderitem_ids").exec();
+    return this.orderModel
+      .find()
+      .populate("orderitem_ids")
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
+      .exec();
   }
 
   async findOne(id: string): Promise<Order> {
@@ -106,6 +110,7 @@ export class OrderService {
         path: "orderitem_ids",
         model: "OrderItem", // Rõ ràng chỉ định model
       })
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
       .exec();
     if (!order) {
       throw new NotFoundException("Order not found");
@@ -166,6 +171,7 @@ export class OrderService {
           model: "Mobile",
         },
       })
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
       .exec();
     return order;
   }
@@ -199,6 +205,7 @@ export class OrderService {
           model: "Mobile",
         },
       }) // Optional: populate order items if needed
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
       .exec();
   }
 }

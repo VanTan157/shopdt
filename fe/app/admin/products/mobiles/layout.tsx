@@ -6,7 +6,7 @@ export default async function AdminMobilesLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="pl-4 pt-2">
+    <div className="pt-2 bg-white">
       <ProductTypesList />
       {children}
     </div>

@@ -1,11 +1,11 @@
-import ReqApi from "@/lib/ResApi";
+import MobileApi from "@/lib/api/mobile/mobile";
 import ProductList from "../product-list";
 
 const Page = async ({ params }: { params: { id: string } }) => {
   let products = null;
   try {
     const { id } = await params;
-    const res = await ReqApi.getAllMobilebyType(id);
+    const res = await MobileApi.getAllMobilebyType(id);
     products = res;
   } catch (error) {
     if (error instanceof Error) {

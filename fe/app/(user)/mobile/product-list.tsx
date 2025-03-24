@@ -28,14 +28,14 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white">
       <div
-        className={`grid ${getColumnCount()} gap-4 px-4 md:px-6 py-8 bg-gray-50`}
+        className={`grid ${getColumnCount()} gap-4 px-4 md:px-6 py-8 bg-white`}
       >
         {products.map((product) => (
           <div
             key={product._id}
-            className="group relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden"
+            className="group relative py-4 bg-white border border-gray-200 hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden"
             style={{ height: "300px" }} // Đảm bảo chiều cao cố định cho tất cả thẻ
           >
             <Link
@@ -50,7 +50,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                   fill
                   priority
                   unoptimized
-                  quality={80}
+                  quality={100}
                   className="object-contain rounded-t-xl"
                 />
                 {product.IsPromotion && (
@@ -61,14 +61,14 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
 
               {/* Product Info */}
-              <div className="p-3 flex flex-col flex-grow text-center space-y-1">
+              <div className="p-3 flex flex-col flex-grow space-y-1">
                 <p className="text-sm font-semibold text-gray-800 line-clamp-2 leading-tight">
                   {product.name}
                 </p>
-                <p className="text-xs text-gray-500 line-clamp-1">
+                <span className="text-xs text-gray-500 line-clamp-1">
                   {product.specifications?.storage}GB
-                </p>
-                <div className="flex justify-center items-center space-x-2">
+                </span>
+                <div className="flex items-center space-x-2">
                   <p className="text-sm font-semibold text-red-600">
                     {product.finalPrice.toLocaleString()}đ
                   </p>
@@ -78,7 +78,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                     </p>
                   )}
                 </div>
-                <div className="flex justify-center items-center space-x-1">
+                <div className="flex items-center space-x-1">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
@@ -93,7 +93,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
             </Link>
             <div className="px-3 pb-3">
-              <button className="w-full flex justify-center items-center space-x-1 text-red-600 text-xs font-medium hover:text-red-700">
+              <button className="w-full flex items-center space-x-1 text-red-600 text-xs font-medium hover:text-red-700">
                 <svg
                   className="w-4 h-4"
                   fill="none"

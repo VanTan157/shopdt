@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import https from "@/lib/http";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/cartStore";
@@ -13,9 +12,14 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { OrderItemType } from "@/lib/validate/order";
+import { OrderItemMobileType } from "@/lib/validate/order";
+import OrderApi from "@/lib/api/mobile/order";
 
-const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
+const CartClient = ({
+  initialCarts,
+}: {
+  initialCarts: OrderItemMobileType[];
+}) => {
   console.log(initialCarts);
   const router = useRouter();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -27,12 +31,7 @@ const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
   const removeFromCart = async (id: string) => {
     console.log(id);
     try {
-      const res = await https.delete(`order-items/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const res = await OrderApi.removeOrderItem(id);
       console.log(res);
       decrementCartCount(1);
       router.refresh();
@@ -52,10 +51,10 @@ const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
     }
   };
 
-  const editItem = (id: string) => {
-    // Logic để chỉnh sửa sản phẩm
-    console.log(`Edit item with id: ${id}`);
-  };
+  // const editItem = (id: string) => {
+  //   // Logic để chỉnh sửa sản phẩm
+  //   console.log(`Edit item with id: ${id}`);
+  // };
 
   const buyNow = () => {
     setIsModalOpen(true);
@@ -65,20 +64,11 @@ const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
     setAddress("");
     setPhone("");
     try {
-      const res = await https.post(
-        `/order`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        },
-        {
-          orderitem_ids: selectedItems,
-          phone_number: phone,
-          address,
-        }
-      );
+      const res = await OrderApi.addOrderItemInOrder({
+        selectedItems,
+        phone,
+        address,
+      });
       console.log(res);
       setIsModalOpen(false);
       toast.success("Đặt hàng thành công!");
@@ -105,7 +95,7 @@ const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
             {initialCarts.map((item) => (
               <li
                 key={item._id}
-                className="flex items-center p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out"
+                className="flex items-center py-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out"
               >
                 <div className="relative w-32 h-32 flex-shrink-0">
                   <Image
@@ -119,9 +109,9 @@ const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
                 </div>
                 <div className="flex-1 ml-4">
                   <h2 className="text-xl font-semibold">
-                    {item.mobile_id.name}
+                    {item.mobile_id.name} - {item.colorVariant.color}
                   </h2>
-                  <p className="text-gray-700">{item.colorVariant.color}</p>
+
                   <p className="text-gray-700">
                     Unit Price: {item.unit_price.toLocaleString()} VNĐ
                   </p>
@@ -148,12 +138,12 @@ const CartClient = ({ initialCarts }: { initialCarts: OrderItemType[] }) => {
                         ? "Unselect"
                         : "Select to Buy"}
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => editItem(item._id)}
                       className="bg-yellow-500 text-white px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-yellow-600"
                     >
                       Edit
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </li>

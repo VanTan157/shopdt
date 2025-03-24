@@ -1,16 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { MobileTType } from "@/app/validate";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from "@/components/ui/dialog"; // Giả sử bạn dùng Dialog từ thư viện Shadcn/UI
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -18,256 +7,482 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import https from "@/lib/http";
+import { MobileTType, MobileType } from "@/lib/validate/mobile";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-
-interface MobileFormData {
-  name: string;
-  StartingPrice: string;
-  promotion: string;
-  description: string;
-  mobile_type_id: string;
-  image?: File | null;
-}
+import { useState } from "react";
 
 const BtnAddMobile = ({ type }: { type: MobileTType[] }) => {
-  const [formData, setFormData] = useState<MobileFormData>({
+  const [editMobile, setEditMobile] = useState<MobileType>({
+    _id: "",
     name: "",
-    StartingPrice: "",
-    promotion: "0",
-    description: "",
-    mobile_type_id: "",
-    image: null,
+    StartingPrice: 0,
+    promotion: 0,
+    finalPrice: 0,
+    IsPromotion: false,
+    isAvailable: true,
+    mobile_type_id: { _id: "", type: "" },
+    colorVariants: [],
+    specifications: {
+      cpu: "",
+      ram: 0,
+      storage: 0,
+      battery: 0,
+      screenSize: 0,
+      resolution: "",
+      os: "",
+    },
+    tags: [],
   });
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+
+  const handleImageChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, image: file }));
-      setPreviewImage(URL.createObjectURL(file));
-    } else {
-      setFormData((prev) => ({ ...prev, image: null }));
-      setPreviewImage(null);
-    }
-  };
+      const previewUrl = URL.createObjectURL(file);
+      const newPreviewImages = [...previewImages];
+      newPreviewImages[index] = previewUrl;
+      setPreviewImages(newPreviewImages);
 
-  const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, mobile_type_id: value }));
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("StartingPrice", formData.StartingPrice);
-      data.append("promotion", formData.promotion);
-      data.append("description", formData.description);
-      data.append("mobile_type_id", formData.mobile_type_id);
-      if (formData.image) {
-        data.append("image", formData.image);
-      }
-
-      const response = await https.post(
-        "/mobiles",
-        {
-          credentials: "include",
-        },
-        data
-      );
-
-      console.log(response);
-
-      toast.success("Thêm sản phẩm thành công");
-      setFormData({
-        name: "",
-        StartingPrice: "",
-        promotion: "0",
-        description: "",
-        mobile_type_id: "",
-        image: null,
+      setEditMobile({
+        ...editMobile,
+        colorVariants: editMobile.colorVariants.map((variant, i) =>
+          i === index
+            ? { ...variant, image: file as unknown as string | File }
+            : variant
+        ),
       });
-      setPreviewImage(null);
-      setIsOpen(false);
-      router.refresh();
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Lỗi không xác định");
-      }
     }
   };
 
-  const handleCancel = () => {
-    setFormData({
-      name: "",
-      StartingPrice: "",
-      promotion: "0",
-      description: "",
-      mobile_type_id: "",
-      image: null,
+  // Hàm thêm một colorVariant mới
+  const handleAddColorVariant = () => {
+    setEditMobile({
+      ...editMobile,
+      colorVariants: [
+        ...editMobile.colorVariants,
+        { _id: "", color: "", stock: 0, image: "" }, // Thêm một variant mới với giá trị mặc định
+      ],
     });
-    setPreviewImage(null);
-    setIsOpen(false);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
-          Thêm sản phẩm
-        </Button>
-      </DialogTrigger>
-      <DialogContent
-        style={{ width: "70vw", maxWidth: "none", maxHeight: "90vh" }}
-        className="overflow-y-auto p-8 text-xl"
-      >
-        <DialogHeader>
-          <DialogTitle className="text-xl">Thêm sản phẩm mới</DialogTitle>
-          <DialogDescription className="text-lg">
-            Điền thông tin để thêm một sản phẩm mobile mới vào hệ thống.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog>
+        <DialogTrigger className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
+          Tạo sản phẩm
+        </DialogTrigger>
+        <DialogContent
+          style={{ width: "80vw", maxWidth: "none", maxHeight: "90vh" }}
+          className="overflow-auto"
+        >
+          <DialogHeader>
+            <DialogTitle>Thêm sản phẩm mới</DialogTitle>
+            <DialogDescription>
+              Nhập đầy đủ các thông tin của sản phẩm
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="name" className="pb-2">
-              Tên sản phẩm
-            </Label>
-            <Input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Nhập tên sản phẩm"
-              className="p-2"
-            />
+          {/* Các trường thông tin cơ bản */}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name" className="mb-2">
+                Tên
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={editMobile?.name}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    name: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="StartingPrice" className="mb-2">
+                Giá khởi điểm
+              </Label>
+              <Input
+                id="StartingPrice"
+                name="StartingPrice"
+                type="number"
+                value={editMobile?.StartingPrice || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    StartingPrice: parseFloat(e.target.value),
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="promotion" className="mb-2">
+                Khuyến mãi (%)
+              </Label>
+              <Input
+                id="promotion"
+                name="promotion"
+                type="number"
+                value={editMobile?.promotion || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    promotion: parseFloat(e.target.value),
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="description" className="mb-2">
+                Mô tả
+              </Label>
+              <Input
+                id="description"
+                name="description"
+                value={editMobile?.description || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    description: e.target.value,
+                  })
+                }
+              />
+            </div>
           </div>
-
           <div>
-            <Label htmlFor="StartingPrice" className="pb-2">
-              Giá khởi điểm
-            </Label>
-            <Input
-              id="StartingPrice"
-              name="StartingPrice"
-              value={formData.StartingPrice}
-              onChange={handleInputChange}
-              placeholder="Nhập giá khởi điểm (VNĐ)"
-              type="number"
-              className="p-2"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="promotion" className="pb-2">
-              Khuyến mãi (%)
-            </Label>
-            <Input
-              id="promotion"
-              name="promotion"
-              value={formData.promotion}
-              onChange={handleInputChange}
-              placeholder="Nhập % khuyến mãi (mặc định 0)"
-              type="number"
-              className="p-2"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="description" className="pb-2">
-              Mô tả
-            </Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Nhập mô tả sản phẩm"
-              className="p-2"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="mobile_type_id" className="pb-2">
-              Loại sản phẩm
-            </Label>
-            <Select
-              value={formData.mobile_type_id}
-              onValueChange={handleSelectChange}
-            >
-              <SelectTrigger className="p-2">
-                <SelectValue placeholder="Chọn loại sản phẩm" />
+            <Label className="mb-2">Loại</Label>
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Theme" />
               </SelectTrigger>
               <SelectContent>
-                {type.map((mobileType) => (
-                  <SelectItem key={mobileType._id} value={mobileType._id}>
-                    {mobileType.type}
+                {type.map((t) => (
+                  <SelectItem key={t._id} value={t._id}>
+                    {t.type}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div>
-            <Label htmlFor="image" className="pb-2">
-              Hình ảnh
-            </Label>
-            <Input
-              id="image"
-              name="image"
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/gif"
-              onChange={handleFileChange}
-              className="p-2"
-            />
-            {previewImage && (
-              <div className="mt-2">
-                <Label>Xem trước ảnh:</Label>
-                <div className="relative w-24 h-24">
-                  <Image
-                    src={previewImage}
-                    alt="Preview"
-                    fill
-                    className="object-cover rounded-md"
+          {/* Camera */}
+          <div className="space-y-2">
+            <div>
+              <Label htmlFor="cameraFront" className="mb-2">
+                Camera trước
+              </Label>
+              <Input
+                id="cameraFront"
+                value={editMobile?.camera?.front || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    camera: {
+                      ...editMobile.camera,
+                      front: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="cameraRear" className="mb-2">
+                Camera sau
+              </Label>
+              <Input
+                id="cameraRear"
+                value={editMobile?.camera?.rear || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    camera: {
+                      ...editMobile.camera,
+                      rear: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          {/* Color Variants */}
+          <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+            {editMobile?.colorVariants?.map((variant, index) => (
+              <div
+                key={index} // Sử dụng index làm key vì đây là form mới, không có _id
+                className="flex items-center gap-4 p-4 bg-white rounded-md shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex-1">
+                  <Label
+                    htmlFor={`color-${index}`}
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Tên màu
+                  </Label>
+                  <Input
+                    id={`color-${index}`}
+                    value={variant?.color || ""}
+                    onChange={(e) =>
+                      setEditMobile({
+                        ...editMobile,
+                        colorVariants: editMobile.colorVariants.map((v, i) =>
+                          i === index ? { ...v, color: e.target.value } : v
+                        ),
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
+                <div className="flex-1">
+                  <Label
+                    htmlFor={`stock-${index}`}
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Số lượng
+                  </Label>
+                  <Input
+                    id={`stock-${index}`}
+                    type="number"
+                    value={variant?.stock || ""}
+                    onChange={(e) =>
+                      setEditMobile({
+                        ...editMobile,
+                        colorVariants: editMobile.colorVariants.map((v, i) =>
+                          i === index
+                            ? { ...v, stock: parseFloat(e.target.value) || 0 }
+                            : v
+                        ),
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Label
+                    htmlFor={`image-${index}`}
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Hình ảnh
+                  </Label>
+                  <Input
+                    id={`image-${index}`}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(index, e)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                  />
+                  {previewImages[index] && (
+                    <Image
+                      src={previewImages[index]}
+                      alt={variant.color || `Màu ${index}`}
+                      width={60}
+                      height={60}
+                      quality={100}
+                      className="mt-2 rounded-md border border-gray-200"
+                    />
+                  )}
+                </div>
+                <Button
+                  variant="destructive"
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  onClick={() =>
+                    setEditMobile({
+                      ...editMobile,
+                      colorVariants: editMobile.colorVariants.filter(
+                        (_, i) => i !== index
+                      ),
+                    })
+                  }
+                >
+                  Xóa
+                </Button>
               </div>
-            )}
+            ))}
+            <Button
+              onClick={handleAddColorVariant}
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Thêm màu mới
+            </Button>
           </div>
-        </div>
 
-        <div className="flex justify-end space-x-4 mt-8">
-          <Button
-            onClick={handleCancel}
-            className="h-8 px-4  bg-gray-500 hover:bg-gray-600"
-          >
-            Hủy
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            className="h-8 px-4  bg-blue-500 hover:bg-blue-600"
-          >
-            Thêm
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          {/* Specifications */}
+          <div className="space-y-2">
+            <div>
+              <Label className="mb-2" htmlFor="cpu">
+                CPU
+              </Label>
+              <Input
+                id="cpu"
+                value={editMobile?.specifications?.cpu || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    specifications: {
+                      ...editMobile.specifications,
+                      cpu: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label className="mb-2" htmlFor="ram">
+                RAM
+              </Label>
+              <Input
+                id="ram"
+                type="number"
+                value={editMobile?.specifications?.ram || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    specifications: {
+                      ...editMobile.specifications,
+                      ram: parseFloat(e.target.value) || 0,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label className="mb-2" htmlFor="storage">
+                Bộ nhớ
+              </Label>
+              <Input
+                id="storage"
+                type="number"
+                value={editMobile?.specifications?.storage || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    specifications: {
+                      ...editMobile.specifications,
+                      storage: parseFloat(e.target.value) || 0,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label className="mb-2" htmlFor="battery">
+                Pin
+              </Label>
+              <Input
+                id="battery"
+                type="number"
+                value={editMobile?.specifications?.battery || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    specifications: {
+                      ...editMobile.specifications,
+                      battery: parseFloat(e.target.value) || 0,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label className="mb-2" htmlFor="screenSize">
+                Kích thước màn hình
+              </Label>
+              <Input
+                id="screenSize"
+                type="number"
+                value={editMobile?.specifications?.screenSize || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    specifications: {
+                      ...editMobile.specifications,
+                      screenSize: parseFloat(e.target.value) || 0, // Sửa lỗi từ battery thành screenSize
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label className="mb-2" htmlFor="resolution">
+                Độ phân giải
+              </Label>
+              <Input
+                id="resolution"
+                value={editMobile?.specifications?.resolution || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    specifications: {
+                      ...editMobile.specifications,
+                      resolution: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label className="mb-2" htmlFor="os">
+                Hệ điều hành
+              </Label>
+              <Input
+                id="os"
+                value={editMobile?.specifications?.os || ""}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    specifications: {
+                      ...editMobile.specifications,
+                      os: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-2">
+            {editMobile?.tags?.map((tag, index) => (
+              <Input
+                key={index}
+                value={tag}
+                onChange={(e) =>
+                  setEditMobile({
+                    ...editMobile,
+                    tags: editMobile.tags.map((t, i) =>
+                      i === index ? e.target.value : t
+                    ),
+                  })
+                }
+              />
+            ))}
+          </div>
+
+          {/* Nút Hủy và Xác nhận */}
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline">Hủy</Button>
+            <Button>Xác nhận</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

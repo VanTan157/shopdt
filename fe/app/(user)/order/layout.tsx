@@ -6,7 +6,7 @@ export default async function OrderLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="pt-16">
+    <div className="pt-16 bg-white min-h-screen">
       <OrderNav />
       <div>{children}</div>
     </div>

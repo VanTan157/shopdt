@@ -12,10 +12,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import ReqApi from "@/lib/ResApi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { register, RegisterType } from "@/app/validate";
+import AuthApi from "@/lib/api/auth";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -34,7 +34,7 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterType) {
     try {
       setServerError(null);
-      const res = await ReqApi.register(values);
+      const res = await AuthApi.register(values);
       console.log(res);
       router.push("/login");
       form.reset({

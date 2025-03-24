@@ -14,7 +14,7 @@ export default function MobileNav({ product_types }: MobileNavProps) {
 
   return (
     <div
-      className={`fixed top-16 z-10 min-w-full bg-white border-b-2 border-gray-200 transition-all duration-300 ease-in-out ${
+      className={`fixed top-16 z-10 min-w-full  bg-gray-700 border-b-2 border-gray-200 transition-all duration-300 ease-in-out ${
         open ? "left-64" : "left-0" // Điều chỉnh vị trí left thay vì padding-left
       }`}
       style={{ width: open ? "calc(100% - 16rem)" : "calc(100% - 4rem)" }} // Co dãn chiều rộng
@@ -31,7 +31,7 @@ export default function MobileNav({ product_types }: MobileNavProps) {
                   : "text-gray-900 hover:text-red-500 border-b-2 border-transparent hover:border-red-500"
               }`}
             >
-              <Link href={`/mobile/${product_type._id}`}>
+              <Link href={`/mobile/${product_type._id}`} className="text-white">
                 {product_type.type}
               </Link>
             </div>

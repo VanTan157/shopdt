@@ -22,6 +22,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import {
@@ -63,49 +64,54 @@ export function AppSidebar({ admin }: { admin?: boolean }) {
         <Sidebar>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Admin</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {adminItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      {item.subItems ? (
-                        <Collapsible
-                          defaultOpen={false}
-                          className="group/collapsible"
-                        >
-                          <CollapsibleTrigger asChild>
-                            <SidebarMenuButton>
+              <div className="fixed top-0 left-0 z-20 ">
+                <SidebarTrigger />
+              </div>
+              <div className="pt-8">
+                <SidebarGroupLabel>Admin</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {adminItems.map((item) => (
+                      <SidebarMenuItem key={item.title}>
+                        {item.subItems ? (
+                          <Collapsible
+                            defaultOpen={false}
+                            className="group/collapsible"
+                          >
+                            <CollapsibleTrigger asChild>
+                              <SidebarMenuButton>
+                                <item.icon />
+                                <span>{item.title}</span>
+                              </SidebarMenuButton>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                              <SidebarMenuSub>
+                                {item.subItems.map((subItem) => (
+                                  <SidebarMenuSubItem key={subItem.url}>
+                                    <SidebarMenuSubButton asChild>
+                                      <Link href={subItem.url}>
+                                        <subItem.icon />
+                                        <span>{subItem.title}</span>
+                                      </Link>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                ))}
+                              </SidebarMenuSub>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        ) : (
+                          <SidebarMenuButton asChild>
+                            <Link href={item.url}>
                               <item.icon />
                               <span>{item.title}</span>
-                            </SidebarMenuButton>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <SidebarMenuSub>
-                              {item.subItems.map((subItem) => (
-                                <SidebarMenuSubItem key={subItem.url}>
-                                  <SidebarMenuSubButton asChild>
-                                    <Link href={subItem.url}>
-                                      <subItem.icon />
-                                      <span>{subItem.title}</span>
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
-                            </SidebarMenuSub>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      ) : (
-                        <SidebarMenuButton asChild>
-                          <Link href={item.url}>
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      )}
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
+                            </Link>
+                          </SidebarMenuButton>
+                        )}
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </div>
             </SidebarGroup>
           </SidebarContent>
         </Sidebar>

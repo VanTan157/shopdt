@@ -1,3 +1,4 @@
+import { Transform } from "class-transformer";
 import {
   IsString,
   IsNumber,
@@ -14,10 +15,12 @@ export class UpdateMobileDto {
 
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
   StartingPrice?: number;
 
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
   promotion?: number;
 
   @IsString()
@@ -43,11 +46,7 @@ export class UpdateMobileDto {
   @IsArray()
   @IsObject({ each: true })
   @IsOptional()
-  colorVariants?: { color: string; image?: string }[];
-
-  @IsNumber()
-  @IsOptional()
-  stock?: number;
+  colorVariants?: { color: string; image?: string; stock?: number }[];
 
   @IsObject()
   @IsOptional()
@@ -58,6 +57,7 @@ export class UpdateMobileDto {
 
   @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
   weight?: number;
 
   @IsArray()

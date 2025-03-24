@@ -32,6 +32,7 @@ export class OrderItemsService {
     return this.orderItemModel
       .find({ user_id: userId, _id: { $nin: usedOrderItemIds } })
       .populate("mobile_id")
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
       .exec();
   }
 
@@ -65,7 +66,11 @@ export class OrderItemsService {
   }
 
   async findAll() {
-    return this.orderItemModel.find().populate("mobile_id").exec();
+    return this.orderItemModel
+      .find()
+      .populate("mobile_id")
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
+      .exec();
   }
 
   async findOne(id: string) {
@@ -87,6 +92,7 @@ export class OrderItemsService {
     const orderItem = await this.orderItemModel
       .find({ user_id: id })
       .populate("mobile_id")
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
       .exec();
     if (!orderItem) throw new NotFoundException("User not found");
     return orderItem;

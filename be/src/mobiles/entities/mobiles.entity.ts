@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
-@Schema({ timestamps: true }) // Thêm createdAt và updatedAt
+@Schema({ timestamps: true })
 export class Mobile extends Document {
   @Prop({ required: true })
   name: string;
@@ -26,43 +26,41 @@ export class Mobile extends Document {
 
   @Prop({ type: Object })
   specifications: {
-    screenSize?: number; // inch Kích thước màn hình
-    resolution?: string; // "2796 x 1290" Độ phân giải màn hình
-    cpu?: string; // "Apple A16 Bionic"
-    ram?: number; // GB
-    storage?: number; // GB Dung lượng lưu trữ
-    battery?: number; // mAh Dung lượng pin
-    os?: string; // "iOS 16" Hệ điều hành
+    screenSize?: number;
+    resolution?: string;
+    cpu?: string;
+    ram?: number;
+    storage?: number;
+    battery?: number;
+    os?: string;
   };
 
   @Prop({
     type: [
       {
-        color: { type: String, required: true }, // Tên màu
-        image: { type: String, required: true }, // Ảnh tương ứng
+        color: { type: String, required: true },
+        image: { type: String, required: true },
+        stock: { type: Number, required: true, default: 0 }, // Thêm stock cho từng màu
       },
     ],
     default: [],
   })
-  colorVariants: { color: string; image: string }[];
-
-  @Prop({ type: Number, default: 0 })
-  stock: number; //số lượng
+  colorVariants: { color: string; image: string; stock: number }[];
 
   @Prop({ type: Boolean, default: true })
-  isAvailable: boolean; //trạng thái
+  isAvailable: boolean;
 
   @Prop({ type: Object })
   camera: {
-    rear?: string; // "48MP + 12MP"
-    front?: string; // "12MP"
+    rear?: string;
+    front?: string;
   };
 
   @Prop({ type: Number })
-  weight: number; // gram
+  weight: number;
 
   @Prop({ type: [String], default: [] })
-  tags: string[]; // ["smartphone", "5G"]
+  tags: string[];
 }
 
 export const MobileSchema = SchemaFactory.createForClass(Mobile);

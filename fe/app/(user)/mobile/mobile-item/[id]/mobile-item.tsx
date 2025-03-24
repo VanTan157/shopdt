@@ -10,16 +10,19 @@ const MobileItem = ({ product }: { product: MobileType }) => {
   const [count, setCount] = useState(0);
 
   const handleClick = (value: number) => {
-    setCount(value);
-    console.log(value);
+    // Chỉ cho phép click nếu stock > 0
+    if (product.colorVariants[value].stock > 0) {
+      setCount(value);
+      console.log(value);
+    }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl bg-gray-50">
+    <div className="container mx-auto px-4 py-8 max-w-5xl bg-white">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Phần ảnh sản phẩm */}
         <div className="relative flex flex-col items-center">
-          <div className="relative w-full max-w-[400px] h-[400px] bg-white rounded-xl shadow-md p-4">
+          <div className="relative w-full max-w-[400px] h-[400px] bg-white p-4">
             <Image
               src={`http://localhost:8080${product.colorVariants[count]?.image}`}
               alt={`${product.name} - ${product.colorVariants[count]?.color}`}
@@ -63,32 +66,47 @@ const MobileItem = ({ product }: { product: MobileType }) => {
           <div className="space-y-3">
             <p className="text-base font-semibold text-gray-800">Màu sắc:</p>
             <div className="flex flex-wrap gap-3">
-              {product.colorVariants.map((variant, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleClick(index)}
-                  className={`flex flex-col items-center cursor-pointer p-2 rounded-lg transition-all duration-200 ${
-                    count === index
-                      ? "bg-blue-50 border border-blue-500"
-                      : "border border-gray-200 hover:border-blue-400"
-                  }`}
-                >
-                  <Image
-                    src={`http://localhost:8080${variant.image}`}
-                    alt={variant.color}
-                    width={50}
-                    height={50}
-                    className="object-contain rounded-md"
-                  />
-                  <span className="text-xs text-gray-700 mt-2 text-center">
-                    {variant.color}
-                  </span>
-                </div>
-              ))}
+              {product.colorVariants.map((variant, index) => {
+                const isOutOfStock = variant.stock === 0;
+                return (
+                  <div
+                    key={index}
+                    onClick={() => handleClick(index)}
+                    className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                      isOutOfStock
+                        ? "cursor-not-allowed opacity-50 border border-gray-300"
+                        : `cursor-pointer ${
+                            count === index
+                              ? "bg-blue-50 border border-blue-500"
+                              : "border border-gray-200 hover:border-blue-400"
+                          }`
+                    }`}
+                  >
+                    <Image
+                      src={`http://localhost:8080${variant.image}`}
+                      alt={variant.color}
+                      width={50}
+                      height={50}
+                      className="object-contain rounded-md"
+                    />
+                    <span className="text-xs text-gray-700 mt-2 text-center">
+                      {variant.color}
+                    </span>
+                    <span className="text-xs text-gray-700 mt-2 text-center">
+                      Kho: {variant.stock}
+                    </span>
+                    {isOutOfStock && (
+                      <span className="text-xs text-red-500 mt-1 font-semibold">
+                        Hết hàng
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Nút hành động (bỏ comment nếu cần) */}
+          {/* Nút hành động */}
           <div className="flex space-x-4">
             <BtnBuyNow
               product={product}
@@ -103,7 +121,7 @@ const MobileItem = ({ product }: { product: MobileType }) => {
       </div>
 
       {/* Thông tin chi tiết */}
-      <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
+      <div className="mt-8 bg-white p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           Thông tin chi tiết
         </h2>
@@ -147,14 +165,6 @@ const MobileItem = ({ product }: { product: MobileType }) => {
           <div className="flex justify-between border-b border-gray-200 py-2">
             <span className="font-medium">Hệ điều hành:</span>
             <span>{product.specifications?.os}</span>
-          </div>
-          <div className="flex justify-between border-b border-gray-200 py-2">
-            <span className="font-medium">Số lượng:</span>
-            <span>{product.stock}</span>
-          </div>
-          <div className="flex justify-between border-b border-gray-200 py-2">
-            <span className="font-medium">Tags:</span>
-            <span>{product.tags.join(", ")}</span>
           </div>
         </div>
       </div>

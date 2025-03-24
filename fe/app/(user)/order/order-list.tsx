@@ -1,11 +1,7 @@
-import { OrderType } from "@/app/validate";
+import { OrderMobileType } from "@/lib/validate/order";
 import Image from "next/image";
 
-interface OrderNavProps {
-  orders: OrderType[];
-}
-
-const OrderList = ({ orders }: OrderNavProps) => {
+const OrderList = ({ orders }: { orders: OrderMobileType[] }) => {
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">
@@ -56,7 +52,7 @@ const OrderList = ({ orders }: OrderNavProps) => {
                     >
                       <div className="flex items-center space-x-4">
                         <Image
-                          src={`http://localhost:8080${item.mobile_id.image}`}
+                          src={`http://localhost:8080${item.colorVariant.image}`}
                           alt={item.mobile_id.name}
                           width={60}
                           height={60}
@@ -65,7 +61,7 @@ const OrderList = ({ orders }: OrderNavProps) => {
                         />
                         <div>
                           <p className="text-gray-800 font-medium">
-                            {item.mobile_id.name}
+                            {item.mobile_id.name} - {item.colorVariant.color}
                           </p>
                           <p className="text-gray-500 text-xs">
                             Giá: {item.mobile_id.finalPrice.toLocaleString()}

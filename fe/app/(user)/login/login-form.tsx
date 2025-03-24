@@ -13,9 +13,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import ReqApi from "@/lib/ResApi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import AuthApi from "@/lib/api/auth";
 
 export function LoginForm() {
   const router = useRouter();
@@ -33,7 +33,7 @@ export function LoginForm() {
   async function onSubmit(values: LoginType) {
     try {
       setServerError(null);
-      const res = await ReqApi.login(values);
+      const res = await AuthApi.login(values);
       console.log(res);
       router.push("/");
       router.refresh();

@@ -1,6 +1,5 @@
 "use client";
 
-import { MobileTType, MobileType } from "@/app/validate";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,51 +8,143 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Image from "next/image";
-import { useState } from "react";
-import BtnDeleteMobile from "./btn-delete-mobile";
-import BtnEditMobile from "./btn-edit-mobile";
+import { useState, useMemo } from "react";
+import { MobileTType, MobileType } from "@/lib/validate/mobile";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import MobileDetail from "./mobile-detail";
 
 const MobileTable = ({
   mobiles,
-  type,
-}: {
+}: // type,
+{
   mobiles: MobileType[];
   type?: MobileTType[];
 }) => {
-  const [promotionFilter, setPromotionFilter] = useState<string>("all"); // Bộ lọc mặc định là "Tất cả"
+  const [promotionFilter, setPromotionFilter] = useState<string>("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState<string>("all");
   const [searchName, setSearchName] = useState<string>("");
+  const [sortField, setSortField] = useState<keyof MobileType | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [open, setOpen] = useState<boolean>(false);
+  const [mobile, setMobile] = useState<MobileType>();
 
-  // Hàm lọc danh sách sản phẩm dựa trên promotionFilter
-  const filteredMobiles = mobiles.filter((mobile) => {
+  // Hàm xử lý sắp xếp
+  const handleSort = (field: keyof MobileType) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  // Lọc và sắp xếp danh sách sản phẩm
+  const filteredAndSortedMobiles = useMemo(() => {
+    let result = [...mobiles];
+
     // Lọc theo khuyến mãi
-    const matchesPromotion =
-      promotionFilter === "all" ||
-      (promotionFilter === "yes" && mobile.IsPromotion) ||
-      (promotionFilter === "no" && !mobile.IsPromotion);
+    result = result.filter((mobile) => {
+      const matchesPromotion =
+        promotionFilter === "all" ||
+        (promotionFilter === "yes" && mobile.IsPromotion) ||
+        (promotionFilter === "no" && !mobile.IsPromotion);
 
-    // Lọc theo tên sản phẩm
-    const matchesSearch = mobile.name
-      .toLowerCase()
-      .includes(searchName.toLowerCase());
+      // Lọc theo trạng thái khả dụng
+      const matchesAvailability =
+        availabilityFilter === "all" ||
+        (availabilityFilter === "yes" && mobile.isAvailable) ||
+        (availabilityFilter === "no" && !mobile.isAvailable);
 
-    return matchesPromotion && matchesSearch;
-  });
+      // Lọc theo tên sản phẩm
+      const matchesSearch = mobile.name
+        .toLowerCase()
+        .includes(searchName.toLowerCase());
+
+      return matchesPromotion && matchesAvailability && matchesSearch;
+    });
+
+    // Sắp xếp
+    if (sortField) {
+      result.sort((a, b) => {
+        const valueA = a[sortField];
+        const valueB = b[sortField];
+
+        if (sortField === "createdAt") {
+          return sortOrder === "asc"
+            ? new Date(valueA as string).getTime() -
+                new Date(valueB as string).getTime()
+            : new Date(valueB as string).getTime() -
+                new Date(valueA as string).getTime();
+        }
+
+        if (typeof valueA === "number" && typeof valueB === "number") {
+          return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+        }
+
+        if (typeof valueA === "string" && typeof valueB === "string") {
+          return sortOrder === "asc"
+            ? valueA.localeCompare(valueB)
+            : valueB.localeCompare(valueA);
+        }
+
+        return 0;
+      });
+    }
+
+    return result;
+  }, [
+    mobiles,
+    promotionFilter,
+    availabilityFilter,
+    searchName,
+    sortField,
+    sortOrder,
+  ]);
 
   const handleFilterChange = (value: string) => {
     setPromotionFilter(value);
+  };
+
+  const handleAvailabilityFilterChange = (value: string) => {
+    setAvailabilityFilter(value);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchName(e.target.value);
   };
 
+  const OpenMobileDetail = ({ mobile }: { mobile?: MobileType }) => {
+    setOpen(true);
+    setMobile(mobile);
+    console.log(open);
+  };
+
   return (
-    <div className="overflow-x-auto pr-4 pt-2">
-      <div className="mb-4 flex items-center space-x-4">
+    <div className="p-6 bg-white min-h-screen">
+      <MobileDetail
+        open={open}
+        setOpen={setOpen}
+        mobile={mobile}
+        setMobile={setMobile}
+      />
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        Quản lý sản phẩm
+      </h1>
+
+      {/* Bộ lọc và tìm kiếm */}
+      <div className="mb-6 flex flex-wrap items-center gap-4">
         {/* Bộ lọc Khuyến mãi */}
-        <div className="flex items-center space-x-2">
-          <label className="text-lg font-medium">Khuyến mãi:</label>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Khuyến mãi:
+          </label>
           <Select value={promotionFilter} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-40 h-10">
               <SelectValue placeholder="Chọn bộ lọc" />
@@ -66,9 +157,27 @@ const MobileTable = ({
           </Select>
         </div>
 
+        {/* Bộ lọc Trạng thái khả dụng */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Khả dụng:</label>
+          <Select
+            value={availabilityFilter}
+            onValueChange={handleAvailabilityFilterChange}
+          >
+            <SelectTrigger className="w-40 h-10">
+              <SelectValue placeholder="Chọn bộ lọc" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="yes">Có</SelectItem>
+              <SelectItem value="no">Không</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Thanh tìm kiếm */}
-        <div className="flex items-center space-x-2">
-          <label className="text-lg font-medium">Tìm kiếm:</label>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Tìm kiếm:</label>
           <Input
             value={searchName}
             onChange={handleSearchChange}
@@ -77,84 +186,116 @@ const MobileTable = ({
           />
         </div>
       </div>
-      <table className="min-w-full border-collapse border border-gray-200">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-200 px-4 py-2 text-left">
-              Hình ảnh
-            </th>
-            <th className="border border-gray-200 px-4 py-2 text-left">
-              Tên sản phẩm
-            </th>
-            <th className="border border-gray-200 px-4 py-2 text-left">
-              Giá khởi điểm
-            </th>
 
-            <th className="border border-gray-200 px-4 py-2 text-left">
-              Khuyến mãi
-            </th>
-            <th className="border border-gray-200 px-4 py-2 text-left">
-              Giá cuối cùng
-            </th>
-            <th className="border border-gray-200 px-4 py-2 text-left">
-              Đang khuyến mãi
-            </th>
-            <th className="border border-gray-200 px-4 py-2 text-left">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredMobiles.map((mobile) => (
-            <tr key={mobile._id} className="hover:bg-gray-50">
-              {/* Hình ảnh */}
-              <td className="border border-gray-200 px-4 py-2">
-                <div className="relative w-16 h-16">
-                  <Image
-                    src={`http://localhost:8080${mobile.image}`}
-                    alt={mobile.name}
-                    fill
-                    className="object-cover rounded-md"
-                  />
-                </div>
-              </td>
+      {/* Bảng sản phẩm */}
+      <div className="border rounded-lg shadow-sm bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-100">
+              <TableHead
+                className="px-4 py-3 text-left font-semibold text-gray-700 cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                Tên sản phẩm{" "}
+                {sortField === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+              </TableHead>
+              <TableHead
+                className="px-4 py-3 text-left font-semibold text-gray-700 cursor-pointer"
+                onClick={() => handleSort("StartingPrice")}
+              >
+                Giá khởi điểm{" "}
+                {sortField === "StartingPrice" &&
+                  (sortOrder === "asc" ? "↑" : "↓")}
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left font-semibold text-gray-700">
+                Khuyến mãi
+              </TableHead>
+              <TableHead
+                className="px-4 py-3 text-left font-semibold text-gray-700 cursor-pointer"
+                onClick={() => handleSort("finalPrice")}
+              >
+                Giá cuối cùng{" "}
+                {sortField === "finalPrice" &&
+                  (sortOrder === "asc" ? "↑" : "↓")}
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left font-semibold text-gray-700">
+                Đang khuyến mãi
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left font-semibold text-gray-700">
+                Khả dụng
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left font-semibold text-gray-700">
+                Màu sắc
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAndSortedMobiles.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={11}
+                  className="text-center py-4 text-gray-500"
+                >
+                  Không tìm thấy sản phẩm nào.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredAndSortedMobiles.map((mobile) => (
+                <TableRow
+                  onClick={() => OpenMobileDetail({ mobile })}
+                  key={mobile._id}
+                  className="hover:bg-gray-50"
+                >
+                  {/* Tên sản phẩm */}
+                  <TableCell className="px-4 py-3">{mobile.name}</TableCell>
 
-              {/* Tên sản phẩm */}
-              <td className="border border-gray-200 px-4 py-2">
-                {mobile.name}
-              </td>
+                  {/* Giá khởi điểm */}
+                  <TableCell className="px-4 py-3">
+                    {mobile.StartingPrice.toLocaleString("vi-VN")} VNĐ
+                  </TableCell>
 
-              {/* Giá khởi điểm */}
-              <td className="border border-gray-200 px-4 py-2">
-                {mobile.StartingPrice.toLocaleString("vi-VN")} VNĐ
-              </td>
+                  {/* Khuyến mãi */}
+                  <TableCell className="px-4 py-3">
+                    {mobile.promotion}%
+                  </TableCell>
 
-              {/* Khuyến mãi */}
-              <td className="border border-gray-200 px-4 py-2">
-                {mobile.promotion}%
-              </td>
+                  {/* Giá cuối cùng */}
+                  <TableCell className="px-4 py-3">
+                    {mobile.finalPrice.toLocaleString("vi-VN")} VNĐ
+                  </TableCell>
 
-              {/* Giá cuối cùng */}
-              <td className="border border-gray-200 px-4 py-2">
-                {mobile.finalPrice.toLocaleString("vi-VN")} VNĐ
-              </td>
+                  {/* Trạng thái khuyến mãi */}
+                  <TableCell className="px-4 py-3">
+                    {mobile.IsPromotion ? (
+                      <span className="text-green-500 font-medium">Có</span>
+                    ) : (
+                      <span className="text-red-500 font-medium">Không</span>
+                    )}
+                  </TableCell>
 
-              {/* Trạng thái khuyến mãi */}
-              <td className="border border-gray-200 px-4 py-2">
-                {mobile.IsPromotion ? (
-                  <span className="text-green-500">Có</span>
-                ) : (
-                  <span className="text-red-500">Không</span>
-                )}
-              </td>
-              <td className="border border-gray-200 px-4 py-2 space-x-2">
-                <BtnEditMobile mobile={mobile} type={type || []} />
-                <BtnDeleteMobile id={mobile._id} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {/* Trạng thái khả dụng */}
+                  <TableCell className="px-4 py-3">
+                    {mobile.isAvailable ? (
+                      <span className="text-green-500 font-medium">Có</span>
+                    ) : (
+                      <span className="text-red-500 font-medium">Không</span>
+                    )}
+                  </TableCell>
+
+                  {/* Thời gian tạo */}
+
+                  {/* Màu sắc */}
+                  <TableCell className="px-4 py-3">
+                    {mobile.colorVariants
+                      .map((variant) => variant.color)
+                      .join(", ")}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

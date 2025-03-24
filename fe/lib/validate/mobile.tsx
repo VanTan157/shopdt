@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const MobileT = z.object({
+  _id: z.string(),
+  type: z.string(),
+});
+export type MobileTType = z.infer<typeof MobileT>;
+
 // Schema cho MobileType
 const MobileTypeSchema = z.object({
   _id: z.string(),
@@ -27,7 +33,8 @@ const CameraSchema = z.object({
 export const ColorVariantSchema = z.object({
   _id: z.string(),
   color: z.string(),
-  image: z.string(),
+  image: z.union([z.string(), z.instanceof(File)]),
+  stock: z.number().default(0), // Mặc định 0 như trong schema Mongoose
 });
 
 export type ColorVariantType = z.infer<typeof ColorVariantSchema>;
@@ -44,7 +51,6 @@ export const Mobile = z.object({
   mobile_type_id: MobileTypeSchema,
   specifications: SpecificationsSchema.optional(),
   colorVariants: z.array(ColorVariantSchema).default([]), // Mảng colorVariants, mặc định rỗng
-  stock: z.number().default(0), // Mặc định 0 như trong schema Mongoose
   isAvailable: z.boolean().default(true), // Mặc định true như trong schema Mongoose
   camera: CameraSchema.optional(),
   weight: z.number().optional(),

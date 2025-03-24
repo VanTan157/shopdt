@@ -21,9 +21,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { AccountType } from "@/app/validate";
-import https from "@/lib/http";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import AuthApi from "@/lib/api/auth";
 
 const BtnEditProfile = (user: { user: AccountType }) => {
   const [open, setOpen] = useState(false);
@@ -50,16 +50,7 @@ const BtnEditProfile = (user: { user: AccountType }) => {
   // Hàm save cho Account tab
   const saveChange = async () => {
     try {
-      const res = await https.put(
-        `auth/update-profile`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        },
-        { name }
-      );
+      const res = await AuthApi.editProfile(name);
       console.log(res);
       router.refresh();
       setName("");
@@ -77,26 +68,14 @@ const BtnEditProfile = (user: { user: AccountType }) => {
   // Hàm save cho Password tab
   const savePassword = async () => {
     try {
-      const res = await https.put(
-        `auth/change-password`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        },
-        {
-          oldPassword: currentP,
-          newPassword: newP,
-        }
-      );
+      const res = await AuthApi.editPassword({ currentP, newP });
       console.log(res);
       router.refresh();
       setName("");
       setCurrentP("");
       setNewP("");
       setOpen(false);
-      toast.success((res as { message: string }).message);
+      toast.success("Cập nhật thành công");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);

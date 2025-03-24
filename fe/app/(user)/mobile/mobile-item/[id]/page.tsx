@@ -1,17 +1,13 @@
-import https from "@/lib/http";
 import { MobileType } from "@/lib/validate/mobile";
 import MobileItem from "./mobile-item";
+import MobileApi from "@/lib/api/mobile/mobile";
 
 const Page = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
   let product: MobileType | null = null;
 
   try {
-    const res = await https.get<MobileType>(`mobiles/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await MobileApi.getMobileById(id);
     product = res;
   } catch (error) {
     console.error("Error fetching product:", error);

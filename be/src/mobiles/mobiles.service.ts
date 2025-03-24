@@ -39,6 +39,7 @@ export class MobilesService {
         return {
           color: variant.color,
           image: `/image/${files[index].filename}`,
+          stock: variant.stock ?? 0, // Gán stock cho từng màu
         };
       }
     );
@@ -49,9 +50,7 @@ export class MobilesService {
       promotion,
       IsPromotion,
       colorVariants,
-      stock: createMobileDto.stock ?? 0,
-      isAvailable:
-        createMobileDto.stock !== undefined ? createMobileDto.stock > 0 : true,
+      isAvailable: colorVariants.some((variant) => variant.stock > 0), // Cập nhật isAvailable dựa trên stock của các màu
     };
 
     const newMobile = new this.mobileModel(mobileData);
@@ -98,30 +97,47 @@ export class MobilesService {
     const finalPrice = startingPrice - (promotion * startingPrice) / 100;
 
     let colorVariants = mobile.colorVariants;
-    if (updateMobileDto.colorVariants && files) {
-      const oldImagesToDelete = mobile.colorVariants.filter((oldVariant) =>
-        updateMobileDto?.colorVariants?.some(
-          (newVariant, idx) =>
-            newVariant.color === oldVariant.color && files[idx]
-        )
-      );
-      await Promise.all(
-        oldImagesToDelete.map((variant) =>
-          unlinkAsync(`.${variant.image}`).catch((err) =>
-            console.error("Không thể xóa ảnh cũ:", err)
+
+    // Xử lý colorVariants khi có cập nhật
+    if (updateMobileDto.colorVariants) {
+      const newColorVariants = updateMobileDto.colorVariants;
+
+      // Xác định các ảnh cũ cần xóa
+      const oldImagesToDelete = mobile.colorVariants
+        .filter((oldVariant) =>
+          newColorVariants.some(
+            (newVariant, idx) =>
+              newVariant.color === oldVariant.color && files?.[idx] // Có file mới cho màu này
           )
         )
-      );
+        .map((variant) => variant.image); // Lấy danh sách đường dẫn ảnh cũ
 
-      colorVariants = updateMobileDto.colorVariants.map((variant, index) => ({
+      // Xóa ảnh cũ khỏi thư mục
+      if (oldImagesToDelete.length > 0) {
+        await Promise.all(
+          oldImagesToDelete.map((imagePath) =>
+            unlinkAsync(`.${imagePath}`).catch((err) =>
+              console.error(`Không thể xóa ảnh cũ ${imagePath}:`, err)
+            )
+          )
+        );
+      }
+
+      // Cập nhật colorVariants với thông tin mới
+      colorVariants = newColorVariants.map((variant, index) => ({
         color: variant.color,
-        image: files[index]
-          ? `/image/${files[index].filename}`
+        image: files?.[index]
+          ? `/image/${files[index].filename}` // Ảnh mới từ file upload
           : mobile.colorVariants.find((v) => v.color === variant.color)
-              ?.image || "",
+              ?.image || "", // Giữ ảnh cũ nếu không có file mới
+        stock:
+          variant.stock ??
+          mobile.colorVariants.find((v) => v.color === variant.color)?.stock ??
+          0,
       }));
     }
 
+    // Cập nhật bản ghi trong database
     const updatedMobile = await this.mobileModel
       .findByIdAndUpdate(
         id,
@@ -132,11 +148,7 @@ export class MobilesService {
           StartingPrice: startingPrice,
           promotion,
           colorVariants,
-          stock: updateMobileDto.stock ?? mobile.stock,
-          isAvailable:
-            updateMobileDto.stock !== undefined
-              ? updateMobileDto.stock > 0
-              : mobile.isAvailable,
+          isAvailable: colorVariants.some((variant) => variant.stock > 0),
         },
         { new: true }
       )
@@ -151,14 +163,19 @@ export class MobilesService {
     const mobile = await this.mobileModel.findById(id).exec();
     if (!mobile) throw new NotFoundException("Không tìm thấy Mobile");
 
-    await Promise.all(
-      mobile.colorVariants.map((variant) =>
-        unlinkAsync(`.${variant.image}`).catch((err) =>
-          console.error("Không thể xóa ảnh:", err)
+    // Xóa tất cả ảnh trong thư mục
+    const imagePaths = mobile.colorVariants.map((variant) => variant.image);
+    if (imagePaths.length > 0) {
+      await Promise.all(
+        imagePaths.map((imagePath) =>
+          unlinkAsync(`.${imagePath}`).catch((err) =>
+            console.error(`Không thể xóa ảnh ${imagePath}:`, err)
+          )
         )
-      )
-    );
+      );
+    }
 
+    // Xóa bản ghi trong database
     return this.mobileModel.findByIdAndDelete(id).exec();
   }
 

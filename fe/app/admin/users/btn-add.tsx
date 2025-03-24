@@ -66,6 +66,7 @@ const BtnAdd = () => {
       setType("USER");
       setIsOpen(false); // Đóng dialog
     } catch (error) {
+      setIsOpen(true);
       if (error instanceof Error) {
         toast.error(error.message);
       } else toast.error("Lỗi không xác định");

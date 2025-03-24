@@ -50,12 +50,7 @@ export class CreateMobileDto {
     ({ value }) => (typeof value === "string" ? JSON.parse(value) : value),
     { toClassOnly: true }
   )
-  colorVariants: { color: string; image?: string }[];
-
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
-  stock?: number;
+  colorVariants: { color: string; image?: string; stock: number }[];
 
   @IsObject()
   @IsOptional()

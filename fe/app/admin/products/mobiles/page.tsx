@@ -1,10 +1,10 @@
-import ReqApi from "@/lib/ResApi";
 import MobileTable from "./tbl-mobiles";
+import MobileApi from "@/lib/api/mobile/mobile";
 
 const ProductPage = async () => {
   let products = null;
   try {
-    products = await ReqApi.getAllMobile();
+    products = await MobileApi.getAllMobile();
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
@@ -14,7 +14,7 @@ const ProductPage = async () => {
   }
   let product_types = null;
   try {
-    product_types = await ReqApi.getAllMobileType();
+    product_types = await MobileApi.getAllMobileType();
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
