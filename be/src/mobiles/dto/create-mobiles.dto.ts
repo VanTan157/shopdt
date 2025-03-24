@@ -23,7 +23,7 @@ export class CreateMobileDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  description: string;
 
   @IsMongoId()
   mobile_type_id: string;
@@ -34,14 +34,14 @@ export class CreateMobileDto {
     ({ value }) => (typeof value === "string" ? JSON.parse(value) : value),
     { toClassOnly: true }
   )
-  specifications?: {
-    screenSize?: number;
-    resolution?: string;
-    cpu?: string;
-    ram?: number;
-    storage?: number;
-    battery?: number;
-    os?: string;
+  specifications: {
+    screenSize: number;
+    resolution: string;
+    cpu: string;
+    ram: number;
+    storage: number;
+    battery: number;
+    os: string;
   };
 
   @IsArray()
@@ -58,15 +58,15 @@ export class CreateMobileDto {
     ({ value }) => (typeof value === "string" ? JSON.parse(value) : value),
     { toClassOnly: true }
   )
-  camera?: {
-    rear?: string;
-    front?: string;
+  camera: {
+    rear: string;
+    front: string;
   };
 
   @IsNumber()
   @IsOptional()
   @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
-  weight?: number;
+  weight: number;
 
   @IsArray()
   @IsString({ each: true })

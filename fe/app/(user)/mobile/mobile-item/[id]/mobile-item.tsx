@@ -24,7 +24,7 @@ const MobileItem = ({ product }: { product: MobileType }) => {
         <div className="relative flex flex-col items-center">
           <div className="relative w-full max-w-[400px] h-[400px] bg-white p-4">
             <Image
-              src={`http://localhost:8080${product.colorVariants[count]?.image}`}
+              src={`http://192.168.0.106:8080${product.colorVariants[count]?.image}`}
               alt={`${product.name} - ${product.colorVariants[count]?.color}`}
               fill
               className="object-contain rounded-lg"
@@ -38,7 +38,7 @@ const MobileItem = ({ product }: { product: MobileType }) => {
               </div>
             )}
           </div>
-          <div className="mt-3 text-center text-sm font-medium text-gray-700">
+          <div className="mt-3 mb-8 text-center text-sm font-medium text-gray-700">
             {product.colorVariants[count]?.color}
           </div>
         </div>
@@ -48,9 +48,9 @@ const MobileItem = ({ product }: { product: MobileType }) => {
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
             {product.name}
           </h1>
-          <p className="text-base text-gray-600 leading-relaxed">
+          {/* <p className="text-base text-gray-600 leading-relaxed">
             {product.description}
-          </p>
+          </p> */}
           <div className="flex items-center space-x-4">
             <p className="text-2xl md:text-3xl font-semibold text-red-600">
               {product.finalPrice.toLocaleString()} VND
@@ -83,7 +83,7 @@ const MobileItem = ({ product }: { product: MobileType }) => {
                     }`}
                   >
                     <Image
-                      src={`http://localhost:8080${variant.image}`}
+                      src={`http://192.168.0.106:8080${variant.image}`}
                       alt={variant.color}
                       width={50}
                       height={50}
@@ -119,6 +119,9 @@ const MobileItem = ({ product }: { product: MobileType }) => {
           </div>
         </div>
       </div>
+      <p className="text-base text-gray-600 leading-relaxed">
+        {product.description}
+      </p>
 
       {/* Thông tin chi tiết */}
       <div className="mt-8 bg-white p-6">
@@ -151,11 +154,11 @@ const MobileItem = ({ product }: { product: MobileType }) => {
             <span>{product.specifications?.battery} mAh</span>
           </div>
           <div className="flex justify-between border-b border-gray-200 py-2">
-            <span className="font-medium">Camera sau:</span>
+            <span className="font-medium mr-2">Camera sau:</span>
             <span>{product.camera?.rear}</span>
           </div>
           <div className="flex justify-between border-b border-gray-200 py-2">
-            <span className="font-medium">Camera trước:</span>
+            <span className="font-medium mr-2">Camera trước:</span>
             <span>{product.camera?.front}</span>
           </div>
           <div className="flex justify-between border-b border-gray-200 py-2">

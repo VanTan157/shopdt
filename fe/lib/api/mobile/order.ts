@@ -2,6 +2,15 @@ import https from "../../http";
 import { OrderItemMobileType, OrderMobileType } from "../../validate/order";
 
 const OrderApi = {
+  getAllOrder: async (accessToken: string) =>
+    https.get<OrderMobileType[]>(`order`, {
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `accessToken=${accessToken}`,
+      },
+      credentials: "include",
+    }),
+
   getOrderByStatus: async ({
     s,
     accessToken,

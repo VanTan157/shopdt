@@ -100,7 +100,7 @@ const BtnAddCart = ({
           Thêm vào giỏ hàng
           <div ref={cartIconRef} className="inline-block ml-2">
             <Image
-              src={`http://localhost:8080${colorVariants.image}`}
+              src={`http://192.168.0.106:8080${colorVariants.image}`}
               alt={product.name}
               width={24}
               height={24}
@@ -116,7 +116,7 @@ const BtnAddCart = ({
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
             <Image
-              src={`http://localhost:8080${colorVariants.image}`}
+              src={`http://192.168.0.106:8080${colorVariants.image}`}
               alt={product.name}
               width={64}
               height={64}

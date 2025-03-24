@@ -1,5 +1,9 @@
 import https from "../../http";
-import { MobileTType, MobileType } from "../../validate/mobile";
+import {
+  CreateMobileType,
+  MobileTType,
+  MobileType,
+} from "../../validate/mobile";
 
 const MobileApi = {
   getAllMobile: async () =>
@@ -32,7 +36,7 @@ const MobileApi = {
     // Thêm các trường dữ liệu vào FormData
     formData.append("name", mobile.name || "");
     formData.append("StartingPrice", String(mobile.StartingPrice));
-    formData.append("promotion", String(mobile.promotion || ""));
+    formData.append("promotion", String(mobile.promotion || 0));
     formData.append("description", mobile.description || "");
     formData.append("weight", String(mobile.weight || 0));
 
@@ -96,6 +100,67 @@ const MobileApi = {
       },
       credentials: "include",
     }),
+  createMobile: async (mobile: CreateMobileType) => {
+    const formData = new FormData();
+
+    // Thêm các trường dữ liệu vào FormData
+    formData.append("name", mobile.name || "");
+    formData.append("StartingPrice", mobile.StartingPrice.toString());
+    formData.append("promotion", String(mobile.promotion || 0));
+    formData.append("description", mobile.description || "");
+    formData.append("weight", String(mobile.weight || 0));
+    formData.append("mobile_type_id", mobile.mobile_type_id || "");
+
+    // Thêm specifications (chuỗi hóa JSON)
+    if (mobile.specifications) {
+      for (const [key, value] of Object.entries(mobile.specifications)) {
+        formData.append(`specifications[${key}]`, String(value));
+      }
+    }
+
+    // Camera
+    if (mobile.camera) {
+      for (const [key, value] of Object.entries(mobile.camera)) {
+        formData.append(`camera[${key}]`, value);
+      }
+    }
+
+    // Tags
+    if (mobile.tags) {
+      mobile.tags.forEach((tag, index) => {
+        formData.append(`tags[${index}]`, tag);
+      });
+    }
+    // Thêm colorVariants và file ảnh
+    if (mobile.colorVariants) {
+      // Tách dữ liệu không chứa file để gửi dưới dạng JSON
+      const variantsWithoutFiles = mobile.colorVariants.map((variant) => ({
+        color: variant.color || "",
+        stock: variant.stock || 0,
+        // Không gửi image trong JSON vì file sẽ được gửi riêng
+      }));
+      formData.append("colorVariants", JSON.stringify(variantsWithoutFiles));
+
+      // Gửi file ảnh qua trường "images"
+      mobile.colorVariants.forEach((variant) => {
+        if (variant.image instanceof File) {
+          formData.append("images", variant.image);
+        }
+      });
+    }
+    // Log FormData for debugging
+    for (const pair of formData.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+    https.post(
+      `mobiles`,
+      {
+        credentials: "include",
+      },
+
+      formData
+    );
+  },
 };
 
 export default MobileApi;

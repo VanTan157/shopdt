@@ -52,7 +52,7 @@ const OrderList = ({ orders }: { orders: OrderMobileType[] }) => {
                     >
                       <div className="flex items-center space-x-4">
                         <Image
-                          src={`http://localhost:8080${item.colorVariant.image}`}
+                          src={`http://192.168.0.106:8080${item.colorVariant.image}`}
                           alt={item.mobile_id.name}
                           width={60}
                           height={60}

@@ -61,3 +61,25 @@ export const Mobile = z.object({
 
 // TypeScript type tương ứng (nếu cần)
 export type MobileType = z.infer<typeof Mobile>;
+
+export const createMobile = z.object({
+  _id: z.string(),
+  name: z.string(),
+  StartingPrice: z.number(),
+  promotion: z.number(),
+  finalPrice: z.number(),
+  IsPromotion: z.boolean(),
+  description: z.string().optional(), // description không bắt buộc trong schema Mongoose
+  mobile_type_id: z.string(),
+  specifications: SpecificationsSchema.optional(),
+  colorVariants: z.array(ColorVariantSchema).default([]), // Mảng colorVariants, mặc định rỗng
+  isAvailable: z.boolean().default(true), // Mặc định true như trong schema Mongoose
+  camera: CameraSchema.optional(),
+  weight: z.number().optional(),
+  tags: z.array(z.string()).default([]), // Mảng tags, mặc định rỗng
+  createdAt: z.string().optional(), // Từ timestamps: true
+  updatedAt: z.string().optional(), // Từ timestamps: true
+});
+
+// TypeScript type tương ứng (nếu cần)
+export type CreateMobileType = z.infer<typeof createMobile>;

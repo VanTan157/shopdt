@@ -53,6 +53,15 @@ export class OrderController {
 
   @UseGuards(RolesGuard)
   @Roles("ADMIN")
+  @Get("find-all-by-status")
+  findAllByStatus(
+    @Query("status") status: string // Add query parameter for status
+  ) {
+    return this.orderService.getAllByStatus(status);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   @Get()
   findAll() {
     return this.orderService.findAll();

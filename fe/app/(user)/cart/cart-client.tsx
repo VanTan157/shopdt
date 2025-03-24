@@ -27,6 +27,9 @@ const CartClient = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [errors, setErrors] = useState<{ phone?: string; address?: string }>(
+    {}
+  ); // State lưu lỗi
 
   const removeFromCart = async (id: string) => {
     console.log(id);
@@ -51,18 +54,39 @@ const CartClient = ({
     }
   };
 
-  // const editItem = (id: string) => {
-  //   // Logic để chỉnh sửa sản phẩm
-  //   console.log(`Edit item with id: ${id}`);
-  // };
-
   const buyNow = () => {
     setIsModalOpen(true);
   };
 
+  // Hàm validate dữ liệu
+  const validateForm = (): boolean => {
+    const newErrors: { phone?: string; address?: string } = {};
+
+    // Validate số điện thoại
+    if (!phone.trim()) {
+      newErrors.phone = "Số điện thoại không được để trống";
+    } else if (!/^\d{10}$/.test(phone)) {
+      newErrors.phone = "Số điện thoại phải là 10 chữ số";
+    } else if (!/^0\d{9}$/.test(phone)) {
+      newErrors.phone = "Số điện thoại phải bắt đầu bằng 0";
+    }
+
+    // Validate địa chỉ
+    if (!address.trim()) {
+      newErrors.address = "Địa chỉ không được để trống";
+    } else if (address.length < 5) {
+      newErrors.address = "Địa chỉ phải ít nhất 10 ký tự";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
+  };
+
   const handleConfirmPurchase = async () => {
-    setAddress("");
-    setPhone("");
+    if (!validateForm()) {
+      return; // Dừng nếu validation thất bại
+    }
+
     try {
       const res = await OrderApi.addOrderItemInOrder({
         selectedItems,
@@ -70,6 +94,9 @@ const CartClient = ({
         address,
       });
       console.log(res);
+      setPhone(""); // Reset form
+      setAddress("");
+      setErrors({}); // Reset lỗi
       setIsModalOpen(false);
       toast.success("Đặt hàng thành công!");
       decrementCartCount(selectedItems.length);
@@ -99,7 +126,7 @@ const CartClient = ({
               >
                 <div className="relative w-32 h-32 flex-shrink-0">
                   <Image
-                    src={`http://localhost:8080${item.colorVariant.image}`}
+                    src={`http://192.168.0.106:8080${item.colorVariant.image}`}
                     alt={item.mobile_id.name}
                     fill
                     sizes="100px"
@@ -111,7 +138,6 @@ const CartClient = ({
                   <h2 className="text-xl font-semibold">
                     {item.mobile_id.name} - {item.colorVariant.color}
                   </h2>
-
                   <p className="text-gray-700">
                     Unit Price: {item.unit_price.toLocaleString()} VNĐ
                   </p>
@@ -138,12 +164,6 @@ const CartClient = ({
                         ? "Unselect"
                         : "Select to Buy"}
                     </button>
-                    {/* <button
-                      onClick={() => editItem(item._id)}
-                      className="bg-yellow-500 text-white px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-yellow-600"
-                    >
-                      Edit
-                    </button> */}
                   </div>
                 </div>
               </li>
@@ -156,7 +176,7 @@ const CartClient = ({
           <button
             onClick={buyNow}
             disabled={selectedItems.length === 0}
-            className={`mt-4  text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-300 ${
+            className={`mt-4 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-300 ${
               selectedItems.length === 0
                 ? "bg-green-300 cursor-not-allowed"
                 : "hover:bg-green-600 bg-green-500"
@@ -175,32 +195,52 @@ const CartClient = ({
             Hệ thống đang xử lý yêu cầu của bạn.
           </DialogDescription>
           <DialogTitle>Nhập thông tin giao hàng</DialogTitle>
-          <input
-            type="text"
-            placeholder="Số điện thoại"
-            required
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-2 mb-3 border rounded-lg"
-          />
-          <input
-            type="text"
-            placeholder="Địa chỉ"
-            required
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="w-full px-4 py-2 mb-3 border rounded-lg"
-          />
-          <div className="flex justify-end space-x-2">
+          <div className="space-y-4">
+            <div>
+              <input
+                type="text"
+                placeholder="Số điện thoại"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setErrors((prev) => ({ ...prev, phone: "" })); // Xóa lỗi khi nhập
+                }}
+                className={`w-full px-4 py-2 border rounded-lg ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="Địa chỉ"
+                value={address}
+                onChange={(e) => {
+                  setAddress(e.target.value);
+                  setErrors((prev) => ({ ...prev, address: "" })); // Xóa lỗi khi nhập
+                }}
+                className={`w-full px-4 py-2 border rounded-lg ${
+                  errors.address ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {errors.address && (
+                <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+              className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors"
             >
               Hủy
             </button>
             <button
               onClick={handleConfirmPurchase}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg"
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
               Xác nhận
             </button>

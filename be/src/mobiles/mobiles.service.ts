@@ -32,14 +32,16 @@ export class MobilesService {
       createMobileDto.StartingPrice -
       (promotion * createMobileDto.StartingPrice) / 100;
 
+    // Tạo colorVariants từ DTO và files
     const colorVariants = createMobileDto.colorVariants.map(
       (variant, index) => {
-        if (!files[index])
+        if (!files[index]) {
           throw new NotFoundException(`Thiếu ảnh cho màu ${variant.color}`);
+        }
         return {
           color: variant.color,
           image: `/image/${files[index].filename}`,
-          stock: variant.stock ?? 0, // Gán stock cho từng màu
+          stock: variant.stock ?? 0,
         };
       }
     );
@@ -50,21 +52,39 @@ export class MobilesService {
       promotion,
       IsPromotion,
       colorVariants,
-      isAvailable: colorVariants.some((variant) => variant.stock > 0), // Cập nhật isAvailable dựa trên stock của các màu
+      isAvailable: colorVariants.some((variant) => variant.stock > 0),
     };
 
     const newMobile = new this.mobileModel(mobileData);
+
     try {
       return await newMobile.save();
     } catch (error) {
-      await Promise.all(
-        colorVariants.map((variant) =>
-          unlinkAsync(`.${variant.image}`).catch((err) =>
-            console.error("Không thể xóa file:", err)
-          )
-        )
+      // Kiểm tra xem ảnh đã được sử dụng bởi sản phẩm khác chưa trước khi xóa
+      const imagePaths = colorVariants.map((variant) => variant.image);
+      const imagesInUse = await this.mobileModel
+        .find({ "colorVariants.image": { $in: imagePaths } })
+        .exec();
+
+      const imagesInUseSet = new Set(
+        imagesInUse.flatMap((m) => m.colorVariants.map((v) => v.image))
       );
-      throw error;
+      const imagesToDelete = imagePaths.filter(
+        (image) => !imagesInUseSet.has(image)
+      );
+
+      // Chỉ xóa những ảnh không được sử dụng bởi sản phẩm khác
+      if (imagesToDelete.length > 0) {
+        await Promise.all(
+          imagesToDelete.map((imagePath) =>
+            unlinkAsync(`.${imagePath}`).catch((err) =>
+              console.error("Không thể xóa file:", err)
+            )
+          )
+        );
+      }
+
+      throw error; // Ném lại lỗi để client xử lý
     }
   }
 
@@ -102,17 +122,32 @@ export class MobilesService {
     if (updateMobileDto.colorVariants) {
       const newColorVariants = updateMobileDto.colorVariants;
 
-      // Xác định các ảnh cũ cần xóa
-      const oldImagesToDelete = mobile.colorVariants
+      // Xác định các ảnh cũ có thể cần xóa
+      const oldImagesToCheck = mobile.colorVariants
         .filter((oldVariant) =>
           newColorVariants.some(
             (newVariant, idx) =>
               newVariant.color === oldVariant.color && files?.[idx] // Có file mới cho màu này
           )
         )
-        .map((variant) => variant.image); // Lấy danh sách đường dẫn ảnh cũ
+        .map((variant) => variant.image);
 
-      // Xóa ảnh cũ khỏi thư mục
+      // Kiểm tra xem ảnh cũ có được sử dụng bởi sản phẩm khác không
+      const imagesInUse = await this.mobileModel
+        .find({
+          "colorVariants.image": { $in: oldImagesToCheck },
+          _id: { $ne: id },
+        })
+        .exec();
+
+      const imagesInUseSet = new Set(
+        imagesInUse.flatMap((m) => m.colorVariants.map((v) => v.image))
+      );
+      const oldImagesToDelete = oldImagesToCheck.filter(
+        (image) => !imagesInUseSet.has(image)
+      );
+
+      // Xóa ảnh cũ không còn được sử dụng
       if (oldImagesToDelete.length > 0) {
         await Promise.all(
           oldImagesToDelete.map((imagePath) =>
@@ -124,17 +159,18 @@ export class MobilesService {
       }
 
       // Cập nhật colorVariants với thông tin mới
-      colorVariants = newColorVariants.map((variant, index) => ({
-        color: variant.color,
-        image: files?.[index]
-          ? `/image/${files[index].filename}` // Ảnh mới từ file upload
-          : mobile.colorVariants.find((v) => v.color === variant.color)
-              ?.image || "", // Giữ ảnh cũ nếu không có file mới
-        stock:
-          variant.stock ??
-          mobile.colorVariants.find((v) => v.color === variant.color)?.stock ??
-          0,
-      }));
+      colorVariants = newColorVariants.map((variant, index) => {
+        const existingVariant = mobile.colorVariants.find(
+          (v) => v.color === variant.color
+        );
+        return {
+          color: variant.color,
+          image: files?.[index]
+            ? `/image/${files[index].filename}` // Ảnh mới từ file upload
+            : existingVariant?.image || "", // Giữ ảnh cũ nếu không có file mới
+          stock: variant.stock ?? existingVariant?.stock ?? 0,
+        };
+      });
     }
 
     // Cập nhật bản ghi trong database

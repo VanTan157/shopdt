@@ -45,7 +45,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               {/* Image Container */}
               <div className="relative w-full h-40 overflow-hidden">
                 <Image
-                  src={`http://localhost:8080${product.colorVariants[0]?.image}`}
+                  src={`http://192.168.0.106:8080${product.colorVariants[0]?.image}`}
                   alt={product.name}
                   fill
                   priority

@@ -95,7 +95,14 @@ export class OrderService {
   async findAll() {
     return this.orderModel
       .find()
-      .populate("orderitem_ids")
+      .populate({
+        path: "orderitem_ids",
+        model: "OrderItem", // Populate OrderItem
+        populate: {
+          path: "mobile_id",
+          model: "Mobile",
+        },
+      })
       .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
       .exec();
   }
@@ -191,6 +198,39 @@ export class OrderService {
     }
 
     const query: any = { user_id: userId };
+    if (status) {
+      query.status = status;
+    }
+
+    return this.orderModel
+      .find(query)
+      .populate({
+        path: "orderitem_ids",
+        model: "OrderItem", // Populate OrderItem
+        populate: {
+          path: "mobile_id",
+          model: "Mobile",
+        },
+      }) // Optional: populate order items if needed
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần (gần nhất trước)
+      .exec();
+  }
+
+  async getAllByStatus(status: string): Promise<Order[]> {
+    // Validate status against allowed values
+    const validStatuses = [
+      "Đang chờ xác nhận",
+      "Đã xác nhận",
+      "Đang vận chuyển",
+      "Hoàn thành",
+      "Đã hủy",
+    ];
+
+    if (status && !validStatuses.includes(status)) {
+      throw new Error("Invalid status value");
+    }
+
+    const query: any = {};
     if (status) {
       query.status = status;
     }
