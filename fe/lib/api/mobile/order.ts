@@ -1,5 +1,11 @@
+import { ColorVariantType } from "./../../validate/mobile";
+import { MobileType } from "@/lib/validate/mobile";
 import https from "../../http";
-import { OrderItemMobileType, OrderMobileType } from "../../validate/order";
+import {
+  CartCeateMobileType,
+  OrderItemMobileType,
+  OrderMobileType,
+} from "../../validate/order";
 
 const OrderApi = {
   getAllOrder: async (accessToken: string) =>
@@ -70,6 +76,57 @@ const OrderApi = {
         orderitem_ids: selectedItems,
         phone_number: phone,
         address,
+      }
+    ),
+  editOrder: async ({
+    id,
+    orderUpdate,
+  }: {
+    id: string;
+    orderUpdate: unknown;
+  }) =>
+    https.patch<OrderMobileType[]>(
+      `order/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      },
+      orderUpdate
+    ),
+  deleteOrder: async ({ id }: { id: string }) =>
+    https.delete<OrderMobileType[]>(`order/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }),
+  addToCart: async ({
+    product,
+    quantity,
+    colorVariants,
+  }: {
+    product: MobileType;
+    quantity: number;
+    colorVariants: ColorVariantType;
+  }) =>
+    https.post<CartCeateMobileType>(
+      "/order-items",
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      },
+      {
+        mobile_id: product._id,
+        quantity,
+        colorVariant: {
+          _id: colorVariants._id,
+          color: colorVariants.color,
+          image: colorVariants.image,
+        },
       }
     ),
 };

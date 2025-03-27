@@ -13,11 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useRef } from "react";
-import { CartCreateType } from "../../validate";
-import https, { HttpError } from "@/lib/http";
+import { HttpError } from "@/lib/http";
 import { toast } from "sonner";
 import { useCartStore } from "@/lib/cartStore";
 import { ColorVariantType, MobileType } from "@/lib/validate/mobile";
+import OrderApi from "@/lib/api/mobile/order";
 
 const BtnAddCart = ({
   product,
@@ -29,27 +29,39 @@ const BtnAddCart = ({
   const [quantity, setQuantity] = useState(1);
   const cartIconRef = useRef<HTMLDivElement | null>(null);
   const { incrementCartCount } = useCartStore();
+  const [quantityError, setQuantityError] = useState<string | null>(null);
 
-  const handleAddCart = async () => {
+  const validateQuantity = (qty: number) => {
+    if (qty < 1) {
+      setQuantityError("Số lượng phải lớn hơn hoặc bằng 1");
+      return false;
+    }
+    if (!Number.isInteger(qty)) {
+      setQuantityError("Số lượng phải là số nguyên");
+      return false;
+    }
+    setQuantityError(null);
+    return true;
+  };
+
+  const handleQuantityChange = (value: number) => {
+    setQuantity(value);
+    validateQuantity(value);
+  };
+
+  const handleAddCart = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (!validateQuantity(quantity)) {
+      event.preventDefault(); // Ngăn dialog đóng khi validation thất bại
+      return;
+    }
+    if (!validateQuantity(quantity)) return;
+
     try {
-      const res = await https.post<CartCreateType>(
-        "/order-items",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        },
-        {
-          mobile_id: product._id,
-          quantity,
-          colorVariant: {
-            _id: colorVariants._id,
-            color: colorVariants.color,
-            image: colorVariants.image,
-          },
-        }
-      );
+      const res = await OrderApi.addToCart({
+        product,
+        quantity,
+        colorVariants,
+      });
       console.log(res);
       incrementCartCount(1);
       toast.success("Thêm vào giỏ hàng thành công");
@@ -100,7 +112,7 @@ const BtnAddCart = ({
           Thêm vào giỏ hàng
           <div ref={cartIconRef} className="inline-block ml-2">
             <Image
-              src={`http://192.168.0.106:8080${colorVariants.image}`}
+              src={`http://localhost:8080${colorVariants.image}`}
               alt={product.name}
               width={24}
               height={24}
@@ -116,7 +128,7 @@ const BtnAddCart = ({
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
             <Image
-              src={`http://192.168.0.106:8080${colorVariants.image}`}
+              src={`http://localhost:8080${colorVariants.image}`}
               alt={product.name}
               width={64}
               height={64}
@@ -138,10 +150,13 @@ const BtnAddCart = ({
               type="number"
               min="1"
               value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
+              onChange={(e) => handleQuantityChange(Number(e.target.value))}
               className="w-full p-2 border border-gray-300 rounded"
               required
             />
+            {quantityError && (
+              <p className="text-red-500 text-sm mt-1">{quantityError}</p>
+            )}
           </div>
         </div>
         <AlertDialogFooter>

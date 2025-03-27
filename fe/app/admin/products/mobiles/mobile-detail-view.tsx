@@ -38,7 +38,7 @@ const MobileDetailView = ({ mobile, onEdit, onDelete }: MobileDetailProps) => {
           {mobile.colorVariants?.map((variant) => (
             <div key={variant._id} className="flex space-x-2 items-center py-2">
               <Image
-                src={`http://192.168.0.106:8080${variant.image}`}
+                src={`http://localhost:8080${variant.image}`}
                 alt={variant.color}
                 width={60}
                 height={60}

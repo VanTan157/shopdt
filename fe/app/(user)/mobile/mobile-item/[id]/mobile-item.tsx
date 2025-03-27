@@ -24,7 +24,7 @@ const MobileItem = ({ product }: { product: MobileType }) => {
         <div className="relative flex flex-col items-center">
           <div className="relative w-full max-w-[400px] h-[400px] bg-white p-4">
             <Image
-              src={`http://192.168.0.106:8080${product.colorVariants[count]?.image}`}
+              src={`http://localhost:8080${product.colorVariants[count]?.image}`}
               alt={`${product.name} - ${product.colorVariants[count]?.color}`}
               fill
               className="object-contain rounded-lg"
@@ -83,7 +83,7 @@ const MobileItem = ({ product }: { product: MobileType }) => {
                     }`}
                   >
                     <Image
-                      src={`http://192.168.0.106:8080${variant.image}`}
+                      src={`http://localhost:8080${variant.image}`}
                       alt={variant.color}
                       width={50}
                       height={50}

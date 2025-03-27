@@ -1,5 +1,6 @@
 import { OrderMobileType } from "@/lib/validate/order";
 import Image from "next/image";
+import BtnCompeleteOrder from "./btn-compelete-order";
 
 const OrderList = ({ orders }: { orders: OrderMobileType[] }) => {
   return (
@@ -52,7 +53,7 @@ const OrderList = ({ orders }: { orders: OrderMobileType[] }) => {
                     >
                       <div className="flex items-center space-x-4">
                         <Image
-                          src={`http://192.168.0.106:8080${item.colorVariant.image}`}
+                          src={`http://localhost:8080${item.colorVariant.image}`}
                           alt={item.mobile_id.name}
                           width={60}
                           height={60}
@@ -79,6 +80,9 @@ const OrderList = ({ orders }: { orders: OrderMobileType[] }) => {
                   ))}
                 </ul>
               </div>
+              {order.status === "Đang vận chuyển" && (
+                <BtnCompeleteOrder id={order._id} />
+              )}
             </div>
           ))}
         </div>

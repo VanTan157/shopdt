@@ -34,6 +34,11 @@ const TblOrder = ({ orders }: { orders: OrderMobileType[] }) => {
       // Gọi API để chuyển trạng thái sang "Đã xác nhận" (bạn sẽ thêm sau)
       // Ví dụ: await OrderApi.updateOrderStatus(orderId, "Đã xác nhận");
       console.log(`Xác nhận đơn hàng ${orderId}`);
+      const res = await OrderApi.editOrder({
+        id: orderId,
+        orderUpdate: { status: "Đã xác nhận" },
+      });
+      console.log(res);
       toast.success("Đơn hàng đã được xác nhận!");
       router.refresh(); // Refresh để cập nhật dữ liệu
     } catch (error) {
@@ -46,6 +51,11 @@ const TblOrder = ({ orders }: { orders: OrderMobileType[] }) => {
   const VanChuyen = async (orderId: string) => {
     try {
       // Gọi API để chuyển trạng thái sang "Đang vận chuyển" (bạn sẽ thêm sau)
+      const res = await OrderApi.editOrder({
+        id: orderId,
+        orderUpdate: { status: "Đang vận chuyển" },
+      });
+      console.log(res);
       // Ví dụ: await OrderApi.updateOrderStatus(orderId, "Đang vận chuyển");
       console.log(`Chuyển đơn hàng ${orderId} sang vận chuyển`);
       toast.success("Đơn hàng đã chuyển sang trạng thái vận chuyển!");
@@ -60,10 +70,30 @@ const TblOrder = ({ orders }: { orders: OrderMobileType[] }) => {
   const handleCancelOrder = async (orderId: string) => {
     try {
       //   const res = await OrderApi.updateOrderStatus(orderId, "Đã hủy");
+      const res = await OrderApi.editOrder({
+        id: orderId,
+        orderUpdate: { status: "Đã hủy" },
+      });
+      console.log(res);
       toast.success("Đơn hàng đã được hủy!");
       router.refresh();
     } catch (error) {
       toast.error("Không thể hủy đơn hàng!");
+      console.error(error);
+    }
+  };
+
+  const handledeleteOrder = async (orderId: string) => {
+    try {
+      //   const res = await OrderApi.updateOrderStatus(orderId, "Đã hủy");
+      const res = await OrderApi.deleteOrder({
+        id: orderId,
+      });
+      console.log(res);
+      toast.success("Đơn hàng đã được xóa!");
+      router.refresh();
+    } catch (error) {
+      toast.error("Không thể xóa đơn hàng!");
       console.error(error);
     }
   };
@@ -267,6 +297,17 @@ const TblOrder = ({ orders }: { orders: OrderMobileType[] }) => {
                       } text-white`}
                     >
                       Hủy
+                    </Button>
+                    <Button
+                      onClick={() => handledeleteOrder(order._id)}
+                      disabled={order.status !== "Đã hủy"}
+                      className={`${
+                        order.status !== "Đã hủy"
+                          ? "bg-red-300 cursor-not-allowed"
+                          : "bg-red-500 hover:bg-red-600"
+                      } text-white`}
+                    >
+                      Xóa
                     </Button>
                   </TableCell>
                 </TableRow>

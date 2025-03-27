@@ -40,3 +40,14 @@ export const OrderMobileSchema = z.object({
 });
 
 export type OrderMobileType = z.infer<typeof OrderMobileSchema>;
+
+export const cartCreateMobile = z.object({
+  _id: z.string(),
+  user_id: z.string(),
+  product_id: z.string(),
+  quantity: z.number(),
+  unit_price: z.number(),
+  total_price: z.number(),
+});
+
+export type CartCeateMobileType = z.infer<typeof cartCreateMobile>;

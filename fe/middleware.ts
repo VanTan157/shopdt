@@ -30,7 +30,10 @@ export async function middleware(request: NextRequest) {
   if (privateRouter.includes(url) && !accessToken) {
     return NextResponse.redirect(new URL("/", request.url));
   }
-  if (adminRouter.includes(url) && user?.type !== "ADMIN") {
+  if (user && adminRouter.includes(url) && user.type !== "ADMIN") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+  if (!user && adminRouter.includes(url)) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 }

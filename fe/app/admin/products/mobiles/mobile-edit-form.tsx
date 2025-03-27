@@ -415,7 +415,7 @@ const MobileEditForm = ({ mobile, onConfirm, onCancel }: MobileEditProps) => {
                       />
                     ) : typeof variant?.image === "string" ? (
                       <Image
-                        src={`http://192.168.0.106:8080${variant?.image}`}
+                        src={`http://localhost:8080${variant?.image}`}
                         alt={variant.color || `Màu ${index}`}
                         width={60}
                         height={60}

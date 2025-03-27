@@ -9,6 +9,7 @@ import { OrderItemsModule } from "./order-items/order-items.module";
 import { OrderModule } from "./order/order.module";
 import { MobilesModule } from "./mobiles/mobiles.module";
 import { MobileTypesModule } from "./mobile-types/mobile-types.module";
+import { NotificationsGateway } from "./notifications.gateway";
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { MobileTypesModule } from "./mobile-types/mobile-types.module";
     OrderModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, NotificationsGateway],
 })
 export class AppModule {}

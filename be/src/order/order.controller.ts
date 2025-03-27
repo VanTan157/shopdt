@@ -74,8 +74,8 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles("ADMIN")
+  // @UseGuards(RolesGuard)
+  // @Roles("ADMIN")
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.update(id, updateOrderDto);

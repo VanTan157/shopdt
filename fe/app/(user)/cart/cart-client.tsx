@@ -126,7 +126,7 @@ const CartClient = ({
               >
                 <div className="relative w-32 h-32 flex-shrink-0">
                   <Image
-                    src={`http://192.168.0.106:8080${item.colorVariant.image}`}
+                    src={`http://localhost:8080${item.colorVariant.image}`}
                     alt={item.mobile_id.name}
                     fill
                     sizes="100px"

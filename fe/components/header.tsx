@@ -4,6 +4,7 @@ import MenuProfile from "./menu-profile";
 import { SidebarTrigger } from "./ui/sidebar";
 import { AccountType } from "@/app/validate";
 import ReqApi from "@/lib/ResApi";
+import Contification from "./contification";
 
 const Header = async () => {
   const cookieStore = await cookies();
@@ -29,7 +30,8 @@ const Header = async () => {
           />
         </div>
         {access_token ? (
-          <div className="pr-4" id="avatar-icon">
+          <div className="pr-4 flex space-x-4" id="avatar-icon">
+            <Contification />
             {user && <MenuProfile user={user} />}
           </div>
         ) : (
